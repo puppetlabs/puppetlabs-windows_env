@@ -120,9 +120,7 @@ need changing unless you're having issues with the refreshes.
       broadcast_timeout => 2000,
     }
 
-
-Things that won't end well
----------------------------
+### Things that won't end well
 - Multiple resource declarations controlling the same environment variable with
   at least one in 'clobber' mode. Toes will be stepped on. 
 

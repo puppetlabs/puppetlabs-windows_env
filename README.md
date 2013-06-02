@@ -6,7 +6,11 @@ This module manages Windows environment variables (currently only system environ
 Installation
 ------------
 
-Install the current head from the git repository by going to your puppet modules folder and do
+Install from puppet forge:
+
+    puppet module install badgerious/windows_env
+
+Install from git (do this in your modulepath):
 
     git clone https://github.com/badgerious/puppet-windows-env windows_env
 

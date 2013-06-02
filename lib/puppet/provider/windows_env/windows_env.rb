@@ -1,5 +1,6 @@
 # Depending on puppet version, this feature may or may not include the libraries needed, but
-# if some of them are present, the others should be too.
+# if some of them are present, the others should be too. This check prevents errors from 
+# non Windows nodes that have had this module pluginsynced to them. 
 if Puppet.features.microsoft_windows?
   require 'win32/registry.rb' 
   require 'Win32API'  
@@ -15,8 +16,14 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382%28v=vs.85%29.aspx
   self::ERROR_FILE_NOT_FOUND = 2
 
-  self::REG_HIVE = Win32::Registry::HKEY_LOCAL_MACHINE
-  self::REG_PATH = 'System\CurrentControlSet\Control\Session Manager\Environment'
+  # This feature check is necessary to make 'puppet module build' work, since
+  # it actually executes this code in building.
+  if Puppet.features.microsoft_windows?
+    self::REG_HIVE = Win32::Registry::HKEY_LOCAL_MACHINE
+    self::REG_PATH = 'System\CurrentControlSet\Control\Session Manager\Environment'
+    # see broadcast_changes method for more info about SendMessageTimeout
+    self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
+  end
 
   def exists?
     if @resource[:ensure] == :present && [nil, :nil].include?(@resource[:value])
@@ -138,7 +145,6 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   # and: http://msdn.microsoft.com/en-us/library/windows/desktop/ms644952%28v=vs.85%29.aspx
   # and: http://msdn.microsoft.com/en-us/library/windows/desktop/ms725497%28v=vs.85%29.aspx
   # and for good measure: http://ruby-doc.org/stdlib-1.9.2/libdoc/dl/rdoc/Win32API.html
-  self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
   def broadcast_changes
     debug "Broadcasting changes to environment"
     # About the args: 0xFFFF        = HWND_BROADCAST (send to all windows)

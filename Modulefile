@@ -1,5 +1,5 @@
 name 'badgerious-puppet_env'
-version '0.0.2'
+version '0.0.3'
 summary 'Manages Windows environment variables'
 description 'Create, delete, and insert values into Windows environment variables'
 project_page 'https://github.com/badgerious/puppet-windows-env'

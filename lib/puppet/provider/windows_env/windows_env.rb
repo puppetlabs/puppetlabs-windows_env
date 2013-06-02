@@ -5,7 +5,6 @@ if Puppet.features.microsoft_windows?
   require 'win32/registry.rb' 
   require 'Win32API'  
 end
-require 'set'
 
 Puppet::Type.type(:windows_env).provide(:windows_env) do
   desc "Manage Windows environment variables"
@@ -67,7 +66,8 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       # don't bother checking the content in this case. 
       @resource[:ensure] == :present ? @value == @resource[:value] : true
     when :insert
-      Set.new(@resource[:value].map { |x| x.downcase }).subset?(Set.new(@value.map { |x| x.downcase }))
+      # verify all elements are present and they appear in the correct order
+      @resource[:value].map { |x| @value.find_index { |y| x.casecmp(y) == 0 } }.each_cons(2).all? { |a, b| a && b && a < b }
     when :append
       @value.map { |x| x.downcase }[(-1 * @resource[:value].count)..-1] == @resource[:value].map { |x| x.downcase }
     when :prepend

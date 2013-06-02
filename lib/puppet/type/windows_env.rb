@@ -37,9 +37,10 @@ Puppet::Type.newtype(:windows_env) do
     desc "Set the timeout (in ms) for environment refreshes. This is per top level window, so delay may be longer than provided value."
     validate do |val|
       begin
-        Integer(val)
+        val = Integer(val)
+        val > 0 or raise ArgumentError
       rescue ArgumentError 
-        raise ArgumentError, "broadcast_timeout must be a valid integer"
+        raise ArgumentError, "broadcast_timeout must be a valid positive integer"
       end
     end
     munge { |val| Integer(val) }

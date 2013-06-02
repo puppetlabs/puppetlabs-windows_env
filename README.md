@@ -52,22 +52,23 @@ Valid values:
     its value. If the variable already exists, the puppet resource provided
     content will be merged with the existing content. The puppet provided
     content will be placed at the beginning, and separated from existing
-    entires with `separator`. If the specified value is already in the
+    entries with `separator`. If the specified value is already in the
     variable, but not at the beginning, it will be moved to the beginning. In
-    the case of multiple resources in `prepend` mode on the same variable, the
-    last to be run will be placed at the front of the variable. Note that with
-    multiple `prepend`s on the same resource, there will be shuffling around on
-    every puppet run, since each resource will place its own value at the front
-    of the list when it is run. If there are multiple values that need to be in
-    a specific order and at the beginning, an array can be provided to `value`.
-    The relative ordering of the array items will be maintained when they are
-    inserted into the variable. 
+    the case of multiple resources in `prepend` mode managing the same
+    variable, the values will inserted in the order of evaluation (the last to
+    run will be listed first in the variable).  Note that with multiple
+    `prepend`s on the same resource, there will be shuffling around on every
+    puppet run, since each resource will place its own value at the front of
+    the list when it is run. If there are multiple values that need to be in a
+    specific order, an array can be provided to `value`.  The relative ordering
+    of the array items will be maintained when they are inserted into the
+    variable. 
   - When `ensure => absent`, the value provided by the puppet resource will be
     removed from the environment variable. Other content will be left
     unchanged. The environment variable will not be removed, even if its
     contents are blank. 
 - `append`
-  - Same as `prepend`, except content will be placed at the end of the
+  - Same as `prepend`, except the new value will be placed at the end of the
     variable's existing contents rather than the beginning. 
 - `insert`
   - Same as `prepend` or `append`, except that content is not required to be
@@ -79,7 +80,8 @@ Valid values:
 #### `broadcast_timeout`
 Specifies how long (in ms) to wait (per window) for refreshes to go through
 when environment variables change. Default is 5000ms. This probably doesn't
-need changing unless you're having issues with the refreshes.
+need changing unless you're having issues with the refreshes taking a long time
+(they generally happen nearly instantly). 
 
 ### Examples
 

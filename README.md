@@ -86,8 +86,8 @@ need changing unless you're having issues with the refreshes.
       ensure => present,
     }
 
-    # Title type #2. Variable name is derived from the title, but not value. (because there is no '='). 
-    # This will remove the environment variable 'BADVAR' competely.
+    # Title type #2. Variable name is derived from the title, but not value (because there is no '='). 
+    # This will remove the environment variable 'BADVAR' completely.
     windows_env { 'BADVAR':
       ensure    => absent,
       mergemode => clobber,
@@ -96,6 +96,7 @@ need changing unless you're having issues with the refreshes.
     # Title type #3. Title doesn't set parameters (because both 'variable' and 'value' have
     # been supplied manually). 
     # This will create a new environment variable 'MyVariable' and set its value to 'stuff'. 
+    # If the variable already exists, its value will be replaced with 'stuff'. 
     windows_env {'random_title':
       ensure    => present,
       variable  => 'MyVariable',

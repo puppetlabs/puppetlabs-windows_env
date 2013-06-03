@@ -97,8 +97,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     # the position at which the new value will be inserted when using insert is
     # arbitrary, so may as well group it with append.
     when :insert, :append
-      # delete if already in the string and move to end. 'remove_value' will have no effect in 'insert' mode; we would not have
-      # reached this point if there were something to remove. 
+      # delete if already in the string and move to end.
       remove_value
       @value = @value.concat(@resource[:value]).join(@sep)
       key_write { |key| key[@resource[:variable]] = @value }

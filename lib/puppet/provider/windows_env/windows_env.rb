@@ -67,7 +67,12 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       @resource[:ensure] == :present ? @value == @resource[:value] : true
     when :insert
       # verify all elements are present and they appear in the correct order
-      @resource[:value].map { |x| @value.find_index { |y| x.casecmp(y) == 0 } }.each_cons(2).all? { |a, b| a && b && a < b }
+      indexes = @resource[:value].map { |x| @value.find_index { |y| x.casecmp(y) == 0 } }
+      if indexes.count == 1
+        indexes == [nil] ? false : true
+      else
+        indexes.each_cons(2).all? { |a, b| a && b && a < b }
+      end
     when :append
       @value.map { |x| x.downcase }[(-1 * @resource[:value].count)..-1] == @resource[:value].map { |x| x.downcase }
     when :prepend

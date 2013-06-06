@@ -1,7 +1,11 @@
 Puppet::Type.newtype(:windows_env) do
   desc "Manages Windows environment variables"
 
-  ensurable
+  ensurable do
+    newvalue(:present) { provider.create }
+    newvalue(:absent) { provider.destroy }
+    defaultto(:present)
+  end
 
   # title will look like "#{variable}=#{value}" (The '=' is not permitted in 
   # environment variable names). If no '=' is present, user is giving only

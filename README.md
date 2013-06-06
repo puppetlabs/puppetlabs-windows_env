@@ -22,7 +22,7 @@ Usage
 ### Parameters
 
 #### `ensure`
-Standard ensure, valid values are `absent` or `present`. 
+Standard ensure, valid values are `absent` or `present`. Defaults to `present`. 
 
 #### `variable` (namevar)
 The name of the environment variable. This will be inferred from the title if
@@ -86,11 +86,9 @@ need changing unless you're having issues with the refreshes taking a long time
 ### Examples
 
     # Title type #1. Variable name and value are extracted from title, splitting on '='. 
-    # Default 'insert' mergemode is selected, so this will add 'C:\code\bin' to
-    # PATH, merging it neatly with existing content. 
-    windows_env { 'PATH=C:\code\bin':
-      ensure => present,
-    }
+    # Default 'insert' mergemode is selected and default 'present' ensure is selected, 
+    # so this will add 'C:\code\bin' to PATH, merging it neatly with existing content. 
+    windows_env { 'PATH=C:\code\bin': }
 
     # Title type #2. Variable name is derived from the title, but not value (because there is no '='). 
     # This will remove the environment variable 'BADVAR' completely.

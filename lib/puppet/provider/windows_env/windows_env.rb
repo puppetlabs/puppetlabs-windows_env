@@ -4,6 +4,11 @@
 if Puppet.features.microsoft_windows?
   require 'win32/registry.rb' 
   require 'Win32API'  
+  module Win32
+    class Registry
+      KEY_WOW64_64KEY = 0x0100 unless defined?(KEY_WOW64_64KEY)
+    end
+  end
 end
 
 Puppet::Type.type(:windows_env).provide(:windows_env) do
@@ -35,12 +40,16 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
     @sep = @resource[:separator]
 
+    @reg_types = { :REG_SZ => Win32::Registry::REG_SZ, :REG_EXPAND_SZ => Win32::Registry::REG_EXPAND_SZ }
+    @reg_type = @reg_types[@resource[:type]]
+
     if @resource[:value].class != Array
       @resource[:value] = [@resource[:value]]
     end
 
     begin
-      self.class::REG_HIVE.open(self.class::REG_PATH, Win32::Registry::KEY_READ) { |key| @value = key[@resource[:variable]] } 
+      # key.read returns '[type, data]' and must be used instead of [] because [] expands %variables%. 
+      self.class::REG_HIVE.open(self.class::REG_PATH) { |key| @value = key.read(@resource[:variable])[1] } 
     rescue Win32::Registry::Error => error
       if error.code == self.class::ERROR_FILE_NOT_FOUND
         debug "Environment variable #{@resource[:variable]} not found"
@@ -92,9 +101,10 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
     case @resource[:mergemode]
     when :clobber
+      @reg_type = Win32::Registry::REG_SZ unless @reg_type
       begin
-        self.class::REG_HIVE.create(self.class::REG_PATH, Win32::Registry::KEY_WRITE) do |key| 
-          key[@resource[:variable]] = @resource[:value].join(@sep) 
+        self.class::REG_HIVE.create(self.class::REG_PATH, Win32::Registry::KEY_ALL_ACCESS | Win32::Registry::KEY_WOW64_64KEY) do |key| 
+          key[@resource[:variable], @reg_type] = @resource[:value].join(@sep) 
         end
       rescue Win32::Registry::Error => error
         reg_fail('creating', error)
@@ -104,13 +114,13 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     when :insert, :append
       # delete if already in the string and move to end.
       remove_value
-      @value = @value.concat(@resource[:value]).join(@sep)
-      key_write { |key| key[@resource[:variable]] = @value }
+      @value = @value.concat(@resource[:value])
+      key_write
     when :prepend
       # delete if already in the string and move to front
       remove_value
-      @value = @resource[:value].concat(@value).join(@sep)
-      key_write { |key| key[@resource[:variable]] = @value }
+      @value = @resource[:value].concat(@value)
+      key_write
     end
     broadcast_changes
   end
@@ -122,8 +132,20 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       key_write { |key| key.delete_value(@resource[:variable]) }
     when :insert, :append, :prepend
       remove_value
-      key_write { |key| key[@resource[:variable]] = @value.join(@sep) }
+      key_write
     end
+    broadcast_changes
+  end
+
+  def type
+    # QueryValue returns '[type, value]'
+     current_type = self.class::REG_HIVE.open(self.class::REG_PATH) { |key| Win32::Registry::API.QueryValue(key.hkey, @resource[:variable]) }[0]
+     @reg_types.invert[current_type]
+  end
+
+  def type=(newtype)
+    newtype = @reg_types[newtype]
+    key_write { |key| key[@resource[:variable], newtype] = @value.join(@sep) }
     broadcast_changes
   end
 
@@ -138,7 +160,18 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   end
 
   def key_write(&block)
-    self.class::REG_HIVE.open(self.class::REG_PATH, Win32::Registry::KEY_WRITE, &block)
+    unless block_given?
+      if ! [nil, :nil, :undef].include?(@resource[:type]) && self.type != @resource[:type]
+        # It may be the case that #exists? returns false, but we're still not creating a
+        # new registry value (e.g. when mergmode => insert). In this case, the property getters/setters
+        # won't be called, so we'll go ahead and set type here manually. 
+        newtype = @reg_types[@resource[:type]]
+      else
+        newtype = @reg_types[self.type]
+      end
+        block = proc { |key| key[@resource[:variable], newtype] = @value.join(@sep) }
+    end
+    self.class::REG_HIVE.open(self.class::REG_PATH, Win32::Registry::KEY_WRITE | Win32::Registry::KEY_WOW64_64KEY, &block) 
   rescue Win32::Registry::Error => error
     reg_fail('writing', error)
   end

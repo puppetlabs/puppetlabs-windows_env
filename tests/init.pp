@@ -2,9 +2,8 @@ class windows_env {
   ### SHOULD FAIL ###
 
   # ensure => present, but no value
-  windows_env { 'SHOULD_FAIL1':
-    ensure => present,
-  }
+  windows_env { 'SHOULD_FAIL1': }
+
   # ensure => absent, mergemode => insert, but no value
   windows_env { 'SHOULD_FAIL2':
     mergemode => insert,
@@ -15,14 +14,12 @@ class windows_env {
 
   # Should insert 'C:\foo' at end of PATH
   windows_env { 'PATH=C:\foo':
-    ensure    => present,
     mergemode => append,
   }
 
   # Should insert 'C:\hello;C:\byebye' at the front of PATH
   windows_env { 'PATH':
     mergemode => prepend,
-    ensure    => present,
     value     => ['C:\hello', 'C:\byebye'],
   }
 
@@ -30,7 +27,6 @@ class windows_env {
   windows_env { 'Puppet':
     variable  => 'PATH',
     value     => 'C:\Program Files (x86)\Puppet Labs\Puppet\bin',
-    ensure    => present,
     mergemode => insert,
   }
 
@@ -38,7 +34,6 @@ class windows_env {
   # 'ah-ja'
   windows_env { 'JIMMY=ah-ja':
     mergemode => clobber,
-    ensure    => present,
   }
 
   # Should create environment variable 'TESTER2' with value
@@ -46,9 +41,20 @@ class windows_env {
   windows_env {'TESTER':
     variable  => 'TESTER2',
     mergemode => clobber,
-    ensure    => present,
     value     => ['hello', 'there'],
     separator => ':',
+  }
+
+  # Should create an environment variable 'JAVA_HOME' of type REG_EXPAND_SZ
+  windows_env { 'JAVA_HOME=%ProgramFiles%\Java\jdk1.6.0_02':
+    mergemode => clobber,
+    type      => REG_EXPAND_SZ,
+  }
+
+  # should create an environment variable 'VARGUY', then insert a new value and change its type
+  windows_env { 'VARGUY=C:\hello': }->
+  windows_env { 'VARGUY=C:\byebye':
+    type => REG_EXPAND_SZ,
   }
 
   # Should create a variable 'DELETME', and then delete it. 

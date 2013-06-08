@@ -76,6 +76,25 @@ Valid values:
     are some conflicts that need to be resolved (the conflicts may be better
     resolved with an array given to `value` and with `mergemode => insert`). 
 
+#### `type`
+The type of registry value to use. Default is `undef` for existing keys (i.e.
+don't change the type) and `REG_SZ` when creating new keys. 
+
+Valid values:
+
+- `REG_SZ`
+  - This is a regular registry string item with no substitution. 
+- `REG_EXPAND_SZ`
+  - Values of this type will expand '%' enclosed strings (e.g. %SystemRoot%)
+    derived from other environment variables. If you're on a 64-bit system, be
+    careful here; puppet runs as a 32-bit ruby process, and may be subject to
+    WoW64 registry redirection shenanigans. This module writes keys with the
+    KEY_WOW64_64KEY flag, which on Windows 7+ (Server 2008 R2) systems will
+    disable value rewriting. Older systems will rewrite certain values. The
+    gory details can be found here:
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa384232%28v=vs.85%29.aspx
+    . 
+
 #### `broadcast_timeout`
 Specifies how long (in ms) to wait (per window) for refreshes to go through
 when environment variables change. Default is 5000ms. This probably doesn't
@@ -107,6 +126,12 @@ need changing unless you're having issues with the refreshes taking a long time
       mergemode => clobber,
     }
 
+    # Variables with 'type => REG_EXPAND_SZ' allow other environment variables to be used
+    # by enclosing them in parentheses. 
+    windows_env { 'JAVA_HOME=%ProgramFiles%\Java\jdk1.6.0_02':
+      type => REG_EXPAND_SZ,
+    }
+
     # Creates (if needed) an enviroment variable 'VAR', and sticks 'VAL:VAL2' at
     # the beginning. Separates with : instead of ;. The broadcast_timeout change
     # probably won't make any difference. 
@@ -120,12 +145,16 @@ need changing unless you're having issues with the refreshes taking a long time
     }
 
 ### Things that won't end well
+Certain conflicts can occur which may cause unexpected behavior (which you won't be warned about):
+
 - Multiple resource declarations controlling the same environment variable with
   at least one in 'clobber' mode. Toes will be stepped on. 
+- Multiple resource declarations controlling the same environment variable with
+  different types. More dead toes.  
 
 Compatibility
 -------------
-This module has been tested against a 3.2.1 puppetmaster and 2.7.21 agent. 
+This module has been tested against a 3.2.1 puppetmaster, 2.7.21 and 3.2.1 agents. 
 
 Acknowledgements
 ----------------

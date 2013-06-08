@@ -50,4 +50,9 @@ Puppet::Type.newtype(:windows_env) do
     munge { |val| Integer(val) }
     defaultto(5000)
   end
+
+  newproperty(:type) do
+    desc "What type of registry key to use for the variable. Determines whether interpolation of '%' enclosed names will occur"
+    newvalues(:REG_SZ, :REG_EXPAND_SZ)
+  end
 end

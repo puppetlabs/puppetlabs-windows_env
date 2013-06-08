@@ -85,7 +85,7 @@ Valid values:
 - `REG_SZ`
   - This is a regular registry string item with no substitution. 
 - `REG_EXPAND_SZ`
-  - Values of this type will expand '%' enclosed strings (e.g. %SystemRoot%)
+  - Values of this type will expand '%' enclosed strings (e.g. `%SystemRoot%`)
     derived from other environment variables. If you're on a 64-bit system, be
     careful here; puppet runs as a 32-bit ruby process, and may be subject to
     WoW64 registry redirection shenanigans. This module writes keys with the
@@ -148,9 +148,9 @@ need changing unless you're having issues with the refreshes taking a long time
 Certain conflicts can occur which may cause unexpected behavior (which you won't be warned about):
 
 - Multiple resource declarations controlling the same environment variable with
-  at least one in 'clobber' mode. Toes will be stepped on. 
+  at least one in `mergemode => clobber`. Toes will be stepped on. 
 - Multiple resource declarations controlling the same environment variable with
-  different types. More dead toes.  
+  different `type`s. More squished toes. 
 
 Compatibility
 -------------

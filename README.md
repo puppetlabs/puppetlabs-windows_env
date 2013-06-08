@@ -14,7 +14,7 @@ Install from git (do this in your modulepath):
 
     git clone https://github.com/badgerious/puppet-windows-env windows_env
 
-It is important that the folder where this module resisdes is named windows_env, not puppet-windows-env.
+It is important that the folder where this module resides is named windows_env, not puppet-windows-env.
 
 Usage
 -----
@@ -59,10 +59,9 @@ Valid values:
     run will be listed first in the variable).  Note that with multiple
     `prepend`s on the same resource, there will be shuffling around on every
     puppet run, since each resource will place its own value at the front of
-    the list when it is run. If there are multiple values that need to be in a
-    specific order, an array can be provided to `value`.  The relative ordering
-    of the array items will be maintained when they are inserted into the
-    variable. 
+    the list when it is run. Alternatively, an array can be provided to
+    `value`.  The relative ordering of the array items will be maintained when
+    they are inserted into the variable, and the shuffling will be avoided.
   - When `ensure => absent`, the value provided by the puppet resource will be
     removed from the environment variable. Other content will be left
     unchanged. The environment variable will not be removed, even if its
@@ -123,6 +122,10 @@ need changing unless you're having issues with the refreshes taking a long time
 ### Things that won't end well
 - Multiple resource declarations controlling the same environment variable with
   at least one in 'clobber' mode. Toes will be stepped on. 
+
+Compatibility
+-------------
+This module has been tested against a 3.2.1 puppetmaster and 2.7.21 agent. 
 
 Acknowledgements
 ----------------

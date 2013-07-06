@@ -127,7 +127,7 @@ need changing unless you're having issues with the refreshes taking a long time
     }
 
     # Variables with 'type => REG_EXPAND_SZ' allow other environment variables to be used
-    # by enclosing them in parentheses. 
+    # by enclosing them in percent symbols. 
     windows_env { 'JAVA_HOME=%ProgramFiles%\Java\jdk1.6.0_02':
       type => REG_EXPAND_SZ,
     }

@@ -145,12 +145,17 @@ need changing unless you're having issues with the refreshes taking a long time
     }
 
 ### Things that won't end well
-Certain conflicts can occur which may cause unexpected behavior (which you won't be warned about):
+Certain conflicts can occur which may cause unexpected behavior (which you may not be warned about):
 
 - Multiple resource declarations controlling the same environment variable with
   at least one in `mergemode => clobber`. Toes will be stepped on. 
 - Multiple resource declarations controlling the same environment variable with
   different `type`s. More squished toes. 
+
+If you find yourself using `mergemode => clobber` or `type`, I recommend using
+the environment variable name as the resource title (like the example 'Title
+type #2' above) if you can; this way puppet will flag duplicates for you and
+help identify the conflicts. 
 
 Compatibility
 -------------

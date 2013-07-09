@@ -37,6 +37,10 @@ Puppet::Type.newtype(:windows_env) do
     defaultto(';')
   end
 
+  newparam(:user) do
+    desc "Set the user whose environment will be modified"
+  end
+
   newparam(:broadcast_timeout) do
     desc "Set the timeout (in ms) for environment refreshes. This is per top level window, so delay may be longer than provided value."
     validate do |val|

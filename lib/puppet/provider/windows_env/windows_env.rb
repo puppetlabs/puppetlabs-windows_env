@@ -2,8 +2,10 @@
 # if some of them are present, the others should be too. This check prevents errors from 
 # non Windows nodes that have had this module pluginsynced to them. 
 if Puppet.features.microsoft_windows?
-  require 'win32/registry.rb' 
   require 'Win32API'  
+  require 'puppet/util/windows/security'
+  require 'win32/registry.rb' 
+  require 'windows/error'
   module Win32
     class Registry
       KEY_WOW64_64KEY = 0x0100 unless defined?(KEY_WOW64_64KEY)
@@ -17,18 +19,6 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   confine :osfamily => :windows
   defaultfor :osfamily => :windows
 
-  # http://msdn.microsoft.com/en-us/library/windows/desktop/ms681382%28v=vs.85%29.aspx
-  self::ERROR_FILE_NOT_FOUND = 2
-
-  # This feature check is necessary to make 'puppet module build' work, since
-  # it actually executes this code in building.
-  if Puppet.features.microsoft_windows?
-    self::REG_HIVE = Win32::Registry::HKEY_LOCAL_MACHINE
-    self::REG_PATH = 'System\CurrentControlSet\Control\Session Manager\Environment'
-    # see broadcast_changes method for more info about SendMessageTimeout
-    self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
-  end
-
   def exists?
     if @resource[:ensure] == :present && [nil, :nil].include?(@resource[:value])
       self.fail "'value' parameter must be provided when 'ensure => present'"
@@ -36,6 +26,23 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     if @resource[:ensure] == :absent && [nil, :nil].include?(@resource[:value]) && 
       [:prepend, :append, :insert].include?(@resource[:mergemode])
       self.fail "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{@resource[:mergemode]}'"
+    end
+
+    if @resource[:user]
+      @reg_hive = Win32::Registry::HKEY_USERS
+      user_sid = Puppet::Util::Windows::Security.name_to_sid(@resource[:user])
+      user_sid or self.fail "Username '#{@resource[:user]}' could not be converted to a valid SID"
+      @reg_path = "#{user_sid}\\Environment"
+
+      # possible that user does not have a registry key; we'll try to catch that now and sling a more comprehensible error. 
+      begin
+        @reg_hive.open(@reg_path) {}
+      rescue Win32::Registry::Error => error
+        reg_fail("Can't access Environment for user '#{@resource[:user]}'. Opening", error)
+      end
+    else
+      @reg_hive = Win32::Registry::HKEY_LOCAL_MACHINE
+      @reg_path = 'System\CurrentControlSet\Control\Session Manager\Environment'
     end
 
     @sep = @resource[:separator]
@@ -49,9 +56,9 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
     begin
       # key.read returns '[type, data]' and must be used instead of [] because [] expands %variables%. 
-      self.class::REG_HIVE.open(self.class::REG_PATH) { |key| @value = key.read(@resource[:variable])[1] } 
+      @reg_hive.open(@reg_path) { |key| @value = key.read(@resource[:variable])[1] } 
     rescue Win32::Registry::Error => error
-      if error.code == self.class::ERROR_FILE_NOT_FOUND
+      if error.code == Windows::Error::ERROR_FILE_NOT_FOUND
         debug "Environment variable #{@resource[:variable]} not found"
         return false
       end
@@ -103,7 +110,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     when :clobber
       @reg_type = Win32::Registry::REG_SZ unless @reg_type
       begin
-        self.class::REG_HIVE.create(self.class::REG_PATH, Win32::Registry::KEY_ALL_ACCESS | Win32::Registry::KEY_WOW64_64KEY) do |key| 
+        @reg_hive.create(@reg_path, Win32::Registry::KEY_ALL_ACCESS | Win32::Registry::KEY_WOW64_64KEY) do |key| 
           key[@resource[:variable], @reg_type] = @resource[:value].join(@sep) 
         end
       rescue Win32::Registry::Error => error
@@ -139,7 +146,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
   def type
     # QueryValue returns '[type, value]'
-     current_type = self.class::REG_HIVE.open(self.class::REG_PATH) { |key| Win32::Registry::API.QueryValue(key.hkey, @resource[:variable]) }[0]
+     current_type = @reg_hive.open(@reg_path) { |key| Win32::Registry::API.QueryValue(key.hkey, @resource[:variable]) }[0]
      @reg_types.invert[current_type]
   end
 
@@ -152,7 +159,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   private
 
   def reg_fail(action, error)
-    self.fail "#{action} '#{self.class::REG_HIVE.name}:\\#{self.class::REG_PATH}\\#{@resource[:variable]}' returned error #{error.code}: #{error.message}"
+    self.fail "#{action} '#{@reg_hive.name}:\\#{@reg_path}\\#{@resource[:variable]}' returned error #{error.code}: #{error.message}"
   end
 
   def remove_value
@@ -171,9 +178,16 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       end
         block = proc { |key| key[@resource[:variable], newtype] = @value.join(@sep) }
     end
-    self.class::REG_HIVE.open(self.class::REG_PATH, Win32::Registry::KEY_WRITE | Win32::Registry::KEY_WOW64_64KEY, &block) 
+    @reg_hive.open(@reg_path, Win32::Registry::KEY_WRITE | Win32::Registry::KEY_WOW64_64KEY, &block) 
   rescue Win32::Registry::Error => error
     reg_fail('writing', error)
+  end
+
+  # This feature check is necessary to make 'puppet module build' work, since
+  # it actually executes this code in building.
+  if Puppet.features.microsoft_windows?
+    # see #broadcast_changes for more info about SendMessageTimeout
+    self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
   end
 
   # Make new variable visible without logging off and on again.

@@ -4,11 +4,25 @@
 if Puppet.features.microsoft_windows?
   require 'Win32API'  
   require 'puppet/util/windows/security'
-  require 'win32/registry.rb' 
+  require 'win32/registry' 
   require 'windows/error'
   module Win32
     class Registry
       KEY_WOW64_64KEY = 0x0100 unless defined?(KEY_WOW64_64KEY)
+    end
+  end
+end
+
+# This is apparently the "best" way to do unconditional cleanup for a provider.
+# see https://groups.google.com/forum/#!topic/puppet-dev/Iqs5jEGfu_0
+module Puppet
+  class Transaction
+    # added '_xhg62j' to make sure that if somebody else does this monkey patch, they don't
+    # choose the same name as I do, since that would cause ruby to blow up. 
+    alias_method :evaluate_original_xhg62j, :evaluate
+    def evaluate
+      evaluate_original_xhg62j
+      Puppet::Type::Windows_env::ProviderWindows_env.unload_user_hives
     end
   end
 end
@@ -25,6 +39,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
     self::RegLoadKey = Win32API.new('Advapi32', 'RegLoadKey', 'LPP', 'L')
     self::RegUnLoadKey = Win32API.new('Advapi32', 'RegUnLoadKey', 'LP', 'L')
+    self::FormatMessage = Win32API.new('kernel32', 'FormatMessage', 'LLLLPL', 'L')
   end
 
   # Instances can load hives with #load_user_hive . The class takes care of
@@ -40,7 +55,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
         user_sid = hash[:user_sid]
         username = hash[:username]
         debug "Unloading NTUSER.DAT for '#{username}'"
-        result = self.class::RegUnLoadKey.call(Win32::Registry::HKEY_USERS.hkey, user_sid)
+        result = self::RegUnLoadKey.call(Win32::Registry::HKEY_USERS.hkey, user_sid)
       end
     end
   end
@@ -250,9 +265,15 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
     Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
       result = self.class::RegLoadKey.call(Win32::Registry::HKEY_USERS.hkey, @user_sid, ntuser_path)
-      result == 0 or self.fail "Could not load registry hive for user '#{@resource[:user]}'. RegLoadKey returned: #{result}"
+      unless result == 0
+        _FORMAT_MESSAGE_FROM_SYSTEM = 0x1000
+        message = ' ' * 512
+        self.class::FormatMessage.call(_FORMAT_MESSAGE_FROM_SYSTEM, 0, result, 0, message, message.length)
+        self.fail "Could not load registry hive for user '#{@resource[:user]}'. RegLoadKey returned #{result}: #{message.strip}"
+      end
     end
 
     self.class.loaded_hives << { :user_sid => @user_sid, :username => @resource[:user] }
   end
 end
+

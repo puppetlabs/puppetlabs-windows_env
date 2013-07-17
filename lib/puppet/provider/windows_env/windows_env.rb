@@ -19,6 +19,32 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   confine :osfamily => :windows
   defaultfor :osfamily => :windows
 
+  # This feature check is necessary to make 'puppet module build' work, since
+  # it actually executes this code in building.
+  if Puppet.features.microsoft_windows?
+    self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
+    self::RegLoadKey = Win32API.new('Advapi32', 'RegLoadKey', 'LPP', 'L')
+    self::RegUnLoadKey = Win32API.new('Advapi32', 'RegUnLoadKey', 'LP', 'L')
+  end
+
+  # Instances can load hives with #load_user_hive . The class takes care of
+  # unloading all hives. 
+  @loaded_hives = []
+  class << self
+    attr_reader :loaded_hives
+  end
+
+  def self.unload_user_hives
+    Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
+      @loaded_hives.each do |hash| 
+        user_sid = hash[:user_sid]
+        username = hash[:username]
+        debug "Unloading NTUSER.DAT for '#{username}'"
+        result = self.class::RegUnLoadKey.call(Win32::Registry::HKEY_USERS.hkey, user_sid)
+      end
+    end
+  end
+
   def exists?
     if @resource[:ensure] == :present && [nil, :nil].include?(@resource[:value])
       self.fail "'value' parameter must be provided when 'ensure => present'"
@@ -30,15 +56,18 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
     if @resource[:user]
       @reg_hive = Win32::Registry::HKEY_USERS
-      user_sid = Puppet::Util::Windows::Security.name_to_sid(@resource[:user])
-      user_sid or self.fail "Username '#{@resource[:user]}' could not be converted to a valid SID"
-      @reg_path = "#{user_sid}\\Environment"
+      @user_sid = Puppet::Util::Windows::Security.name_to_sid(@resource[:user])
+      @user_sid or self.fail "Username '#{@resource[:user]}' could not be converted to a valid SID"
+      @reg_path = "#{@user_sid}\\Environment"
 
-      # possible that user does not have a registry key; we'll try to catch that now and sling a more comprehensible error. 
       begin
         @reg_hive.open(@reg_path) {}
       rescue Win32::Registry::Error => error
-        reg_fail("Can't access Environment for user '#{@resource[:user]}'. Opening", error)
+        if error.code == Windows::Error::ERROR_FILE_NOT_FOUND
+          load_user_hive
+        else
+          reg_fail("Can't access Environment for user '#{@resource[:user]}'. Opening", error)
+        end
       end
     else
       @reg_hive = Win32::Registry::HKEY_LOCAL_MACHINE
@@ -82,6 +111,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       # don't bother checking the content in this case. 
       @resource[:ensure] == :present ? @value == @resource[:value] : true
     when :insert
+      # FIXME: this is a weird way to do this
       # verify all elements are present and they appear in the correct order
       indexes = @resource[:value].map { |x| @value.find_index { |y| x.casecmp(y) == 0 } }
       if indexes.count == 1
@@ -183,13 +213,6 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     reg_fail('writing', error)
   end
 
-  # This feature check is necessary to make 'puppet module build' work, since
-  # it actually executes this code in building.
-  if Puppet.features.microsoft_windows?
-    # see #broadcast_changes for more info about SendMessageTimeout
-    self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
-  end
-
   # Make new variable visible without logging off and on again.
   #
   # see: http://stackoverflow.com/questions/190168/persisting-an-environment-variable-through-ruby/190437#190437
@@ -208,4 +231,28 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     # 0             = (Return value. We're ignoring it)
     self.class::SendMessageTimeout.call(0xFFFF, 0x001A, 0, 'Environment', 2, @resource[:broadcast_timeout], 0)
   end    
+
+  # This is the best solution I found to (at least mostly) reliably locate a user's 
+  # ntuser.dat: http://stackoverflow.com/questions/1059460/shgetfolderpath-for-a-specific-user
+  def load_user_hive
+    debug "Loading NTUSER.DAT for '#{@resource[:user]}'"
+
+    home_path = nil
+    begin
+      Win32::Registry::HKEY_LOCAL_MACHINE.open("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\#{@user_sid}") do |key|
+        home_path = key['ProfileImagePath']
+      end
+    rescue Win32::Registry::Error => error
+      self.fail "Cannot find registry hive for user '#{@resource[:user]}'"
+    end
+
+    ntuser_path = File.join(home_path, 'NTUSER.DAT')
+
+    Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
+      result = self.class::RegLoadKey.call(Win32::Registry::HKEY_USERS.hkey, @user_sid, ntuser_path)
+      result == 0 or self.fail "Could not load registry hive for user '#{@resource[:user]}'. RegLoadKey returned: #{result}"
+    end
+
+    self.class.loaded_hives << { :user_sid => @user_sid, :username => @resource[:user] }
+  end
 end

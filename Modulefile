@@ -1,4 +1,4 @@
-name 'badgerious-puppet_env'
+name 'badgerious-windows_env'
 version '1.0.0'
 summary 'Manages Windows environment variables'
 description 'Create, delete, and insert values into Windows environment variables'

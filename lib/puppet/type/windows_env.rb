@@ -26,6 +26,11 @@ Puppet::Type.newtype(:windows_env) do
     isnamevar
   end
 
+  newparam(:user) do
+    desc "Set the user whose environment will be modified"
+    isnamevar
+  end
+
   newparam(:mergemode) do
     desc "How to set the value of the environment variable. E.g. replace existing value, append to existing value..."
     newvalues(:clobber, :insert, :append, :prepend)
@@ -35,10 +40,6 @@ Puppet::Type.newtype(:windows_env) do
   newparam(:separator) do
     desc "How to separate environment variables with multiple values (e.g. PATH)"
     defaultto(';')
-  end
-
-  newparam(:user) do
-    desc "Set the user whose environment will be modified"
   end
 
   newparam(:broadcast_timeout) do

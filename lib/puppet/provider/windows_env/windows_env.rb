@@ -228,23 +228,15 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     reg_fail('writing', error)
   end
 
-  # Make new variable visible without logging off and on again.
-  #
+  # Make new variable visible without logging off and on again. This really only makes sense
+  # for debugging (i.e. with 'puppet agent -t') since you can only broadcast messages to your own
+  # windows, and not to those of other users. 
   # see: http://stackoverflow.com/questions/190168/persisting-an-environment-variable-through-ruby/190437#190437
-  # and: http://msdn.microsoft.com/en-us/library/windows/desktop/ms644952%28v=vs.85%29.aspx
-  # and: http://msdn.microsoft.com/en-us/library/windows/desktop/ms725497%28v=vs.85%29.aspx
-  # and for good measure: http://ruby-doc.org/stdlib-1.9.2/libdoc/dl/rdoc/Win32API.html
   def broadcast_changes
     debug "Broadcasting changes to environment"
-    # About the args:
-    # 0xFFFF        = HWND_BROADCAST (send to all windows)
-    # 0x001A        = WM_SETTINGCHANGE (the message to send, informs windows a system change has occurred)
-    # 0             = NULL (this should always be NULL with WM_SETTINGCHANGE)
-    # 'Environment' = (string indicating what changed. This refers to the 'Environment' registry key)
-    # 2             = SMTO_ABORTIFHUNG (return without waiting timeout period if receiver appears to hang)
-    # bcast timeout = (How long to wait for a window to respond to the event. Each window gets this amount of time)
-    # 0             = (Return value. We're ignoring it)
-    self.class::SendMessageTimeout.call(0xFFFF, 0x001A, 0, 'Environment', 2, @resource[:broadcast_timeout], 0)
+    _HWND_BROADCAST = 0xFFFF
+    _WM_SETTINGCHANGE = 0x1A
+    self.class::SendMessageTimeout.call(_HWND_BROADCAST, _WM_SETTINGCHANGE, 0, 'Environment', 2, @resource[:broadcast_timeout], 0)
   end    
 
   # This is the best solution I found to (at least mostly) reliably locate a user's 

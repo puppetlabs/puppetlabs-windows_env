@@ -97,7 +97,7 @@ Valid values:
 
 #### `broadcast_timeout`
 Specifies how long (in ms) to wait (per window) for refreshes to go through
-when environment variables change. Default is 5000ms. This probably doesn't
+when environment variables change. Default is 100ms. This probably doesn't
 need changing unless you're having issues with the refreshes taking a long time
 (they generally happen nearly instantly). 
 

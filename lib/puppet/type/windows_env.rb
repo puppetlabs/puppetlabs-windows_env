@@ -52,7 +52,7 @@ Puppet::Type.newtype(:windows_env) do
       end
     end
     munge { |val| Integer(val) }
-    defaultto(5000)
+    defaultto(100)
   end
 
   newproperty(:type) do

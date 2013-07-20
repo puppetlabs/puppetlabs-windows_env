@@ -41,7 +41,7 @@ depends on `mergemode`.
 #### `user` (namevar)
 The user whose environment will be modified. Default is `undef`, i.e. system
 environment. The user can be local or domain, as long as they have a local
-profile (typically C:\users\{username} on Vista+).  There is no awareness of
+profile (typically `C:\users\{username}` on Vista+).  There is no awareness of
 network profiles in this module; knowing how changes to the local profile will
 affect a distributed profile is up to you. 
 

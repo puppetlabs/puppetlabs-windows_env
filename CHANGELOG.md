@@ -1,3 +1,7 @@
+v2.0.1
+------
+- Fix documentation (version bump needed to push to puppetforge)
+
 v2.0.0
 ======
 - Remove 'manifests' directory. This directory had nothing useful in it. 

@@ -1,7 +1,7 @@
 windows_env
 ===========
 
-This module manages Windows environment variables (currently only system environment variables). 
+This module manages (system and user) Windows environment variables.
 
 Installation
 ------------

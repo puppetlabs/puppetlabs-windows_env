@@ -1,3 +1,7 @@
+v2.0.2
+-------
+- Fix formatting for puppetforge's markdown interpreter (version bump needed to push to puppetforge)
+
 v2.0.1
 ------
 - Fix documentation (version bump needed to push to puppetforge)

@@ -16,6 +16,11 @@ Install from git (do this in your modulepath):
 
 It is important that the folder where this module resides is named windows_env, not puppet-windows-env.
 
+Changes
+-------
+
+Please see [CHANGELOG.md](https://github.com/badgerious/puppet-windows-env/blob/master/CHANGELOG.md)
+
 Usage
 -----
 
@@ -32,6 +37,13 @@ not given explicitly. The title can be of either the form `{variable}={value}`
 #### `value` (namevar)
 The value of the environment variable. How this will treat existing content
 depends on `mergemode`. 
+
+#### `user` (namevar)
+The user whose environment will be modified. Default is `undef`, i.e. system
+environment. The user can be local or domain, as long as they have a local
+profile (typically C:\users\{username} on Vista+).  There is no awareness of
+network profiles in this module; knowing how changes to the local profile will
+affect a distributed profile is up to you. 
 
 #### `separator`
 How to split entries in environment variables with multiple values (such as
@@ -99,10 +111,14 @@ Valid values:
 Specifies how long (in ms) to wait (per window) for refreshes to go through
 when environment variables change. Default is 100ms. This probably doesn't
 need changing unless you're having issues with the refreshes taking a long time
-(they generally happen nearly instantly). 
+(they generally happen nearly instantly). Note that this only works for the user
+that initiated the puppet run; if puppet runs in the background, updates to the
+environment will not propagate to logged in users until they log out and back in
+or refresh their environment by some other means. 
 
 ### Examples
 
+```puppet
     # Title type #1. Variable name and value are extracted from title, splitting on '='. 
     # Default 'insert' mergemode is selected and default 'present' ensure is selected, 
     # so this will add 'C:\code\bin' to PATH, merging it neatly with existing content. 
@@ -132,6 +148,18 @@ need changing unless you're having issues with the refreshes taking a long time
       type => REG_EXPAND_SZ,
     }
 
+    # Create an environment variable for 'Administrator':
+    windows_env { 'KOOLVAR':
+      value => 'hi',
+      user  => 'Administrator',
+    }
+
+    # Create an environment variable for 'Domain\FunUser':
+    windows_env { 'Funvar':
+      value => 'Funval',
+      user  => 'Domain\FunUser',
+    }
+
     # Creates (if needed) an enviroment variable 'VAR', and sticks 'VAL:VAL2' at
     # the beginning. Separates with : instead of ;. The broadcast_timeout change
     # probably won't make any difference. 
@@ -143,6 +171,8 @@ need changing unless you're having issues with the refreshes taking a long time
       separator         => ':',
       broadcast_timeout => 2000,
     }
+
+```
 
 ### Things that won't end well
 Certain conflicts can occur which may cause unexpected behavior (which you may not be warned about):
@@ -157,9 +187,10 @@ the environment variable name as the resource title (like the example 'Title
 type #2' above) if you can; this way puppet will flag duplicates for you and
 help identify the conflicts. 
 
+
 Compatibility
 -------------
-This module has been tested against a 3.2.1 puppetmaster, 2.7.21 and 3.2.1 agents. 
+This module has been tested against a 3.2.x puppetmaster, 2.7.x and 3.2.x agents. 
 
 Acknowledgements
 ----------------

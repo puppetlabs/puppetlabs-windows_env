@@ -10,6 +10,12 @@ class windows_env {
     ensure    => absent,
   }
 
+  # nonexistent user
+  windows_env { 'SHOULD_FAIL3':
+    value => 'hello',
+    user  => 'jibberishuserwhoshouldnotexist',
+  }
+
   ### SHOULD PASS ###
 
   # Should insert 'C:\foo' at end of PATH
@@ -75,6 +81,17 @@ class windows_env {
     variable => 'PATH',
     ensure   => absent,
     value    => 'C:\path',
+  }
+
+  # Should add 'C:\somecode\bin' to Administrator account's PATH. 
+  windows_env { 'PATH=C:\somecode\bin':
+    user => 'Administrator',
+  }
+
+  # Should remove 'C:\badcode\bin' from Administrator account's PATH. 
+  windows_env { 'PATH=C:\badcode\bin':
+    user   => 'Administrator',
+    ensure => absent,
   }
 }
 

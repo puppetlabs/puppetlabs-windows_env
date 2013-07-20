@@ -119,6 +119,7 @@ or refresh their environment by some other means.
 ### Examples
 
 ```puppet
+
     # Title type #1. Variable name and value are extracted from title, splitting on '='. 
     # Default 'insert' mergemode is selected and default 'present' ensure is selected, 
     # so this will add 'C:\code\bin' to PATH, merging it neatly with existing content. 

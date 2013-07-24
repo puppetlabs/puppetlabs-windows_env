@@ -14,8 +14,6 @@ Install from git (do this in your modulepath):
 
     git clone https://github.com/badgerious/puppet-windows-env windows_env
 
-It is important that the folder where this module resides is named windows_env, not puppet-windows-env.
-
 Changes
 -------
 

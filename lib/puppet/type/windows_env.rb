@@ -1,10 +1,18 @@
 Puppet::Type.newtype(:windows_env) do
   desc "Manages Windows environment variables"
 
-  ensurable do
-    newvalue(:present) { provider.create }
-    newvalue(:absent) { provider.destroy }
-    defaultto(:present)
+  # Track resources that are managing the same environment variable so we can
+  # detect clobber conflicts
+  @collisions = {}
+  def self.check_collisions(resource)
+    user = resource[:user] || :SYSTEM
+    var = resource[:variable].downcase
+    @collisions[user] ||= {}
+    if (resource[:mergemode] == :clobber && @collisions[user][var]) || (@collisions[user][var] && @collisions[user][var][:mergemode] == :clobber)
+      fail "Multiple resources are managing the same environment variable, '#{var}', but at least one is in clobber mergemode. (Offending resources: #{resource}, #{@collisions[user][var]})"
+    else
+      @collisions[user][var] = resource
+    end
   end
 
   # title will look like "#{variable}=#{value}" (The '=' is not permitted in 
@@ -14,6 +22,12 @@ Puppet::Type.newtype(:windows_env) do
   def self.title_patterns
     [[/^(.*?)=(.*)$/, [[:variable, proc{|x| x}], [:value, proc{|x| x}]]],
      [/^([^=]+)$/   , [[:variable, proc{|x| x}]]]]
+  end
+
+  ensurable do
+    newvalue(:present) { provider.create }
+    newvalue(:absent) { provider.destroy }
+    defaultto(:present)
   end
 
   newparam(:variable) do
@@ -77,5 +91,7 @@ Puppet::Type.newtype(:windows_env) do
       [:prepend, :append, :insert].include?(self[:mergemode])
       fail "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{self[:mergemode]}'"
     end
+
+    self.class.check_collisions(self)
   end
 end

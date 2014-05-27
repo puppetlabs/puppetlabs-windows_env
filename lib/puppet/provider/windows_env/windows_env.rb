@@ -13,16 +13,23 @@ if Puppet.features.microsoft_windows?
   end
 end
 
-# This is apparently the "best" way to do unconditional cleanup for a provider.
-# see https://groups.google.com/forum/#!topic/puppet-dev/Iqs5jEGfu_0
-module Puppet
-  class Transaction
-    # added '_xhg62j' to make sure that if somebody else does this monkey patch, they don't
-    # choose the same name as I do, since that would cause ruby to blow up. 
-    alias_method :evaluate_original_xhg62j, :evaluate
-    def evaluate
-      evaluate_original_xhg62j
-      Puppet::Type::Windows_env::ProviderWindows_env.unload_user_hives
+if Puppet.version < '3.4.0'
+  # This is the best pre-3.4.0 way to do unconditional cleanup for a provider.
+  # see https://groups.google.com/forum/#!topic/puppet-dev/Iqs5jEGfu_0
+  module Puppet
+    class Transaction
+      # The alias name (evaluate_orig_windows_env) should be unique to make
+      # sure that if somebody else does this monkey patch, they don't choose
+      # the same name and cause ruby to blow up.
+      alias_method :evaluate_orig_windows_env, :evaluate
+      def evaluate
+        evaluate_orig_windows_env
+        begin
+          Puppet::Type::Windows_env::ProviderWindows_env.post_resource_eval
+        rescue => detail
+          Puppet.log_exception(detail, "post_resource_eval failed for provider windows_env")
+        end
+      end
     end
   end
 end
@@ -49,7 +56,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     attr_reader :loaded_hives
   end
 
-  def self.unload_user_hives
+  def self.post_resource_eval
     Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
       @loaded_hives.each do |hash| 
         user_sid = hash[:user_sid]

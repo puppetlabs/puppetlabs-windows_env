@@ -93,10 +93,6 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     @reg_types = { :REG_SZ => Win32::Registry::REG_SZ, :REG_EXPAND_SZ => Win32::Registry::REG_EXPAND_SZ }
     @reg_type = @reg_types[@resource[:type]]
 
-    if @resource[:value].class != Array
-      @resource[:value] = [@resource[:value]]
-    end
-
     begin
       # key.read returns '[type, data]' and must be used instead of [] because [] expands %variables%. 
       @reg_hive.open(@reg_path) { |key| @value = key.read(@resource[:variable])[1] } 

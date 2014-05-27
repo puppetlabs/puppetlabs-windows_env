@@ -24,6 +24,14 @@ Puppet::Type.newtype(:windows_env) do
   newparam(:value) do
     desc "The environment variable value"
     isnamevar
+
+    munge do |val|
+      if val.class != Array
+        [val]
+      else
+        val
+      end
+    end
   end
 
   newparam(:user) do

@@ -3,6 +3,7 @@
 # non Windows nodes that have had this module pluginsynced to them. 
 if Puppet.features.microsoft_windows?
   require 'Win32API'  
+  require 'puppet/util/windows/error'
   require 'puppet/util/windows/security'
   require 'win32/registry' 
   require 'windows/error'
@@ -46,7 +47,6 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     self::SendMessageTimeout = Win32API.new('user32', 'SendMessageTimeout', 'LLLPLLP', 'L')
     self::RegLoadKey = Win32API.new('Advapi32', 'RegLoadKey', 'LPP', 'L')
     self::RegUnLoadKey = Win32API.new('Advapi32', 'RegUnLoadKey', 'LP', 'L')
-    self::FormatMessage = Win32API.new('kernel32', 'FormatMessage', 'LLLLPL', 'L')
   end
 
   # Instances can load hives with #load_user_hive . The class takes care of
@@ -253,10 +253,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
       result = self.class::RegLoadKey.call(Win32::Registry::HKEY_USERS.hkey, @user_sid, ntuser_path)
       unless result == 0
-        _FORMAT_MESSAGE_FROM_SYSTEM = 0x1000
-        message = ' ' * 512
-        self.class::FormatMessage.call(_FORMAT_MESSAGE_FROM_SYSTEM, 0, result, 0, message, message.length)
-        self.fail "Could not load registry hive for user '#{@resource[:user]}'. RegLoadKey returned #{result}: #{message.strip}"
+        raise Puppet::Util::Windows::Error.new("Could not load registry hive for user '#{@resource[:user]}'", result)
       end
     end
 

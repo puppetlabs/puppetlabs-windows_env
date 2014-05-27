@@ -60,4 +60,14 @@ Puppet::Type.newtype(:windows_env) do
     desc "What type of registry key to use for the variable. Determines whether interpolation of '%' enclosed names will occur"
     newvalues(:REG_SZ, :REG_EXPAND_SZ)
   end
+
+  validate do
+    if self[:ensure] == :present && [nil, :undef].include?(self[:value])
+      fail "'value' parameter must be provided when 'ensure => present'"
+    end
+    if self[:ensure] == :absent && [nil, :undef].include?(self[:value]) &&
+      [:prepend, :append, :insert].include?(self[:mergemode])
+      fail "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{self[:mergemode]}'"
+    end
+  end
 end

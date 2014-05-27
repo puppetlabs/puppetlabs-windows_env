@@ -68,14 +68,6 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   end
 
   def exists?
-    if @resource[:ensure] == :present && [nil, :nil].include?(@resource[:value])
-      self.fail "'value' parameter must be provided when 'ensure => present'"
-    end
-    if @resource[:ensure] == :absent && [nil, :nil].include?(@resource[:value]) && 
-      [:prepend, :append, :insert].include?(@resource[:mergemode])
-      self.fail "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{@resource[:mergemode]}'"
-    end
-
     if @resource[:user]
       @reg_hive = Win32::Registry::HKEY_USERS
       @user_sid = Puppet::Util::Windows::Security.name_to_sid(@resource[:user])

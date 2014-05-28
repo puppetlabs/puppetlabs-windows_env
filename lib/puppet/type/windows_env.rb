@@ -2,16 +2,31 @@ Puppet::Type.newtype(:windows_env) do
   desc "Manages Windows environment variables"
 
   # Track resources that are managing the same environment variable so we can
-  # detect clobber conflicts
-  @collisions = {}
+  # detect mergemode/type conflicts
+  @mergemode = {}
+  @type = {}
   def self.check_collisions(resource)
     user = resource[:user] || :SYSTEM
     var = resource[:variable].downcase
-    @collisions[user] ||= {}
-    if (resource[:mergemode] == :clobber && @collisions[user][var]) || (@collisions[user][var] && @collisions[user][var][:mergemode] == :clobber)
-      fail "Multiple resources are managing the same environment variable, '#{var}', but at least one is in clobber mergemode. (Offending resources: #{resource}, #{@collisions[user][var]})"
+
+    # Cannot have two resources in clobber mode on the same var
+    @mergemode[user] ||= {}
+    last = @mergemode[user][var]
+    if (resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber)
+      fail "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})"
     else
-      @collisions[user][var] = resource
+      @mergemode[user][var] = resource
+    end
+
+    # Cannot have two resources with different types on the same var
+    if ![nil, :undef].include?(resource[:type])
+      @type[user] ||= {}
+      last = @type[user][var]
+      if last && last[:type] != resource[:type]
+        fail "Multiple resources are managing the same environment variable but their types do not agree (Offending resources: #{resource}, #{last})"
+      else
+        @type[user][var] = resource
+      end
     end
   end
 

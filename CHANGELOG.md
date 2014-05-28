@@ -1,9 +1,16 @@
-v2.0.2
--------
+v2.1.0
+------
+- Use `post_resource_eval` hook instead of monkey patching if possible.
+- Some parameter validation moved into the Type (so it is caught earlier and
+  gives a better error message).
+- The validate stage now checks for multiple resources managing the same environment
+  variable in an incompatible way (e.g. two resources in clobber mergemode) and raises
+  an error if such conflicts are found.
+
+### v2.0.2
 - Fix formatting for puppetforge's markdown interpreter (version bump needed to push to puppetforge)
 
-v2.0.1
-------
+### v2.0.1
 - Fix documentation (version bump needed to push to puppetforge)
 
 v2.0.0

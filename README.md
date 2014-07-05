@@ -171,6 +171,16 @@ or refresh their environment by some other means.
       broadcast_timeout => 2000,
     }
 
+    # Exec doStuff.bat whenever environment variable KOOLVAR changes.
+    # Note that if you have multiple windows_env resources managing one
+    # variable, you'll need to either subscribe to all of them or combine
+    # the windows_env resources into one (by passing an array to 'value')
+    # and subscribing to that one resource.
+    exec { 'C:\doStuff.bat':
+      subscribe   => Windows_env['KOOLVAR'],
+      refreshonly => true,
+    }
+
 ```
 
 Acknowledgements

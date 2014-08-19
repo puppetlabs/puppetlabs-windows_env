@@ -14,10 +14,27 @@ Install from git (do this in your modulepath):
 
     git clone https://github.com/badgerious/puppet-windows-env windows_env
 
+This module also requires the 'ffi' gem. This gem is included
+with Puppet 3.3.0+. On older versions, you'll need to do something like:
+
+```puppet
+
+package { 'ffi':
+  ensure   => installed,
+  provider => gem,
+}
+
+```
+
 Changes
 -------
 
 [CHANGELOG.md](https://github.com/badgerious/puppet-windows-env/blob/master/CHANGELOG.md)
+
+Compatibility
+-------------
+
+Puppet 3.7 or greater requires version 2.2.0 or greater of this module.
 
 Usage
 -----
@@ -96,8 +113,8 @@ Valid values:
   - This is a regular registry string item with no substitution. 
 - `REG_EXPAND_SZ`
   - Values of this type will expand '%' enclosed strings (e.g. `%SystemRoot%`)
-    derived from other environment variables. If you're on a 64-bit system, be
-    careful here; puppet runs as a 32-bit ruby process, and may be subject to
+    derived from other environment variables. If you're on a 64-bit system and
+    running 32-bit puppet, be careful here; registry writes may be subject to
     WoW64 registry redirection shenanigans. This module writes keys with the
     KEY_WOW64_64KEY flag, which on Windows 7+ (Server 2008 R2) systems will
     disable value rewriting. Older systems will rewrite certain values. The

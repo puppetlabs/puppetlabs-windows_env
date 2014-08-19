@@ -1,3 +1,7 @@
+v2.2.0
+------
+- Puppet 3.7 / Ruby 64 bit compatibility changes.
+
 v2.1.0
 ------
 - Use `post_resource_eval` hook instead of monkey patching if possible.

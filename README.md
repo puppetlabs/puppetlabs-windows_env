@@ -74,34 +74,32 @@ Valid values:
   - When `ensure => present`, creates a new variable (if necessary) and sets
     its value. If the variable already exists, its value will be overwritten.
   - When `ensure => absent`, the environment variable will be deleted entirely. 
-- `prepend`
+- `insert`
   - When `ensure => present`, creates a new variable (if necessary) and sets
     its value. If the variable already exists, the puppet resource provided
-    content will be merged with the existing content. The puppet provided
-    content will be placed at the beginning, and separated from existing
-    entries with `separator`. If the specified value is already in the
-    variable, but not at the beginning, it will be moved to the beginning. In
-    the case of multiple resources in `prepend` mode managing the same
-    variable, the values will inserted in the order of evaluation (the last to
-    run will be listed first in the variable).  Note that with multiple
-    `prepend`s on the same resource, there will be shuffling around on every
-    puppet run, since each resource will place its own value at the front of
-    the list when it is run. Alternatively, an array can be provided to
-    `value`.  The relative ordering of the array items will be maintained when
-    they are inserted into the variable, and the shuffling will be avoided.
+    content will be merged with the existing content. The puppet provided content
+    will be placed at the end, and separated from existing entries with
+    `separator`. If the specified value is already somewhere in the variable, no
+    change will occur.
   - When `ensure => absent`, the value provided by the puppet resource will be
     removed from the environment variable. Other content will be left
     unchanged. The environment variable will not be removed, even if its
     contents are blank. 
+- `prepend`
+  - Same as `insert`, except Puppet will ensure the value appears **first**. If
+    the specified value is already in the variable, but not at the beginning, it
+    will be moved to the beginning. In the case of multiple resources in
+    `prepend` mode managing the same variable, the values will be inserted in the
+    order of evaluation (the last to run will be listed first in the variable).
+    Note that with multiple `prepend`s on the same resource, there will be
+    shuffling around on every puppet run, since each resource will place its own
+    value at the front of the list when it is run. Alternatively, an array can be
+    provided to `value`.  The relative ordering of the array items will be
+    maintained when they are inserted into the variable, and the shuffling will
+    be avoided.
 - `append`
-  - Same as `prepend`, except the new value will be placed at the end of the
+  - Same as `prepend`, except the new value will be placed at (or be moved to) the end of the
     variable's existing contents rather than the beginning. 
-- `insert`
-  - Same as `prepend` or `append`, except that content is not required to be
-    anywhere in particular. New content will be added at the end, but existing
-    content will not be moved. This is probably the mode to use unless there
-    are some conflicts that need to be resolved (the conflicts may be better
-    resolved with an array given to `value` and with `mergemode => insert`). 
 
 #### `type`
 The type of registry value to use. Default is `undef` for existing keys (i.e.

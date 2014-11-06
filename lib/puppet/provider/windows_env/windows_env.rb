@@ -12,7 +12,9 @@ if Puppet.features.microsoft_windows?
   end
 end
 
-require 'puppet/feature/windows_env'
+require 'puppet/util/feature'
+
+Puppet.features.add(:windows_env, :libs => ['ffi'])
 
 if Puppet.version < '3.4.0'
   # This is the best pre-3.4.0 way to do unconditional cleanup for a provider.
@@ -45,7 +47,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   # The 'windows_env' feature includes FFI.  Here we need to be able to fully
   # load the provider even if FFI is absent so that the catalog can continue
   # (and hopefully install FFI).
-  if Puppet.features.windows_env?
+  if Puppet.features.windows_env? && Puppet.features.microsoft_windows?
     module self::WinAPI
       extend FFI::Library
 

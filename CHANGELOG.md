@@ -1,3 +1,6 @@
+### v2.2.1
+- Fixes to prevent autoloading on master from failing
+
 v2.2.0
 ------
 - Puppet 3.7 / Ruby 64 bit compatibility changes.

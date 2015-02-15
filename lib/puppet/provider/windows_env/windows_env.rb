@@ -58,8 +58,37 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
       ffi_lib :Advapi32
       attach_function :RegLoadKey, :RegLoadKeyA, [:uintptr_t, :pointer, :pointer], :long
-
       attach_function :RegUnLoadKey, :RegUnLoadKeyA, [:uintptr_t, :pointer], :long
+
+      # Ruby < 1.9 doesn't know about encoding.
+      if defined?(::Encoding)
+        # Workaround for https://bugs.ruby-lang.org/issues/10820 .
+        attach_function :RegDeleteValue, :RegDeleteValueW, [:uintptr_t, :buffer_in], :long
+
+        # Borrowed from Puppet core. Duplicated for old version compatibilty.
+        def self.from_string_to_wide_string(str, &block)
+          str.encode!(Encoding::UTF_16LE)
+          FFI::MemoryPointer.new(:byte, str.bytesize) do |ptr|
+            # uchar here is synonymous with byte
+            ptr.put_array_of_uchar(0, str.bytes.to_a)
+            yield ptr
+          end
+          # ptr has already had free called, so nothing to return
+          nil
+        end
+
+        def self.delete_value(key, name)
+          result = nil
+          from_string_to_wide_string(name) do |name_ptr|
+            result = RegDeleteValue(key.hkey, name_ptr)
+          end
+          result
+        end
+      else
+        def self.delete_value(key, name)
+          key.delete_value(name)
+        end
+      end
     end
   end
 
@@ -193,7 +222,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     debug "Removing value from environment variable '#{@resource[:variable]}', or removing variable itself"
     case @resource[:mergemode]
     when :clobber
-      key_write { |key| key.delete_value(@resource[:variable]) }
+      key_write { |key| self.class::WinAPI.delete_value(key, @resource[:variable]) }
     when :insert, :append, :prepend
       remove_value
       key_write

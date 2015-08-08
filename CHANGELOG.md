@@ -1,3 +1,6 @@
+### v2.2.2
+- Updates for Puppet 4 / Ruby 2.1.5 compatibility.
+
 ### v2.2.1
 - Fixes to prevent autoloading on master from failing
 

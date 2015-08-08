@@ -1,6 +1,6 @@
 {
   "name": "badgerious-windows_env",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "author": "badgerious",
   "summary": "Manages Windows environment variables",
   "license": "Apache License, Version 2.0",

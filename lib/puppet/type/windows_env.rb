@@ -12,7 +12,7 @@ Puppet::Type.newtype(:windows_env) do
     # Cannot have two resources in clobber mode on the same var
     @mergemode[user] ||= {}
     last = @mergemode[user][var]
-    raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})" if (resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber)
+    raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})" if (!last.nil? && last.catalog == resource.catalog) && ((resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber))
     @mergemode[user][var] = resource
 
     # Cannot have two resources with different types on the same var

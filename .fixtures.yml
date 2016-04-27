@@ -1,0 +1,4 @@
+fixtures:
+    symlinks:
+      puppet-windows-env: "#{source_dir}"
+    forge_modules:

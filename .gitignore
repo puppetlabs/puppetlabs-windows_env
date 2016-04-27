@@ -1,3 +1,5 @@
 pkg/
 *.swp
 aliases.sh
+spec/fixtures/
+.vagrant/

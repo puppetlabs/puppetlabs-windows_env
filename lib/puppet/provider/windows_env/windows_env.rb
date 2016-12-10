@@ -1,10 +1,10 @@
 # Depending on puppet version, this feature may or may not include the libraries needed, but
-# if some of them are present, the others should be too. This check prevents errors from 
-# non Windows nodes that have had this module pluginsynced to them. 
+# if some of them are present, the others should be too. This check prevents errors from
+# non Windows nodes that have had this module pluginsynced to them.
 if Puppet.features.microsoft_windows?
   require 'puppet/util/windows/error'
   require 'puppet/util/windows/security'
-  require 'win32/registry' 
+  require 'win32/registry'
   module Win32
     class Registry
       KEY_WOW64_64KEY = 0x0100 unless defined?(KEY_WOW64_64KEY)
@@ -14,7 +14,7 @@ end
 
 require 'puppet/util/feature'
 
-Puppet.features.add(:windows_env, :libs => ['ffi'])
+Puppet.features.add(:windows_env, libs: ['ffi'])
 
 if Puppet.version < '3.4.0'
   # This is the best pre-3.4.0 way to do unconditional cleanup for a provider.
@@ -24,13 +24,13 @@ if Puppet.version < '3.4.0'
       # The alias name (evaluate_orig_windows_env) should be unique to make
       # sure that if somebody else does this monkey patch, they don't choose
       # the same name and cause ruby to blow up.
-      alias_method :evaluate_orig_windows_env, :evaluate
+      alias evaluate_orig_windows_env evaluate
       def evaluate
         evaluate_orig_windows_env
         begin
           Puppet::Type::Windows_env::ProviderWindows_env.post_resource_eval
         rescue => detail
-          Puppet.log_exception(detail, "post_resource_eval failed for provider windows_env")
+          Puppet.log_exception(detail, 'post_resource_eval failed for provider windows_env')
         end
       end
     end
@@ -38,11 +38,11 @@ if Puppet.version < '3.4.0'
 end
 
 Puppet::Type.type(:windows_env).provide(:windows_env) do
-  desc "Manage Windows environment variables"
+  desc 'Manage Windows environment variables'
 
-  confine :feature => :windows_env
-  confine :osfamily => :windows
-  defaultfor :osfamily => :windows
+  confine feature: :windows_env
+  confine osfamily: :windows
+  defaultfor osfamily: :windows
 
   # The 'windows_env' feature includes FFI.  Here we need to be able to fully
   # load the provider even if FFI is absent so that the catalog can continue
@@ -66,7 +66,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
         attach_function :RegDeleteValue, :RegDeleteValueW, [:uintptr_t, :buffer_in], :long
 
         # Borrowed from Puppet core. Duplicated for old version compatibilty.
-        def self.from_string_to_wide_string(str, &block)
+        def self.from_string_to_wide_string(str)
           str.encode!(Encoding::UTF_16LE)
           FFI::MemoryPointer.new(:byte, str.bytesize) do |ptr|
             # uchar here is synonymous with byte
@@ -93,7 +93,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   end
 
   # Instances can load hives with #load_user_hive . The class takes care of
-  # unloading all hives. 
+  # unloading all hives.
   @loaded_hives = []
   class << self
     attr_reader :loaded_hives
@@ -101,7 +101,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
   def self.post_resource_eval
     Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
-      @loaded_hives.each do |hash| 
+      @loaded_hives.each do |hash|
         user_sid = hash[:user_sid]
         username = hash[:username]
         debug "Unloading NTUSER.DAT for '#{username}'"
@@ -117,7 +117,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     if @resource[:user]
       @reg_hive = Win32::Registry::HKEY_USERS
       @user_sid = name_to_sid(@resource[:user])
-      @user_sid or self.fail "Username '#{@resource[:user]}' could not be converted to a valid SID"
+      @user_sid || raise("Username '#{@resource[:user]}' could not be converted to a valid SID")
       @reg_path = "#{@user_sid}\\Environment"
 
       begin
@@ -136,12 +136,12 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
     @sep = @resource[:separator]
 
-    @reg_types = { :REG_SZ => Win32::Registry::REG_SZ, :REG_EXPAND_SZ => Win32::Registry::REG_EXPAND_SZ }
+    @reg_types = { REG_SZ: Win32::Registry::REG_SZ, REG_EXPAND_SZ: Win32::Registry::REG_EXPAND_SZ }
     @reg_type = @reg_types[@resource[:type]]
 
     begin
-      # key.read returns '[type, data]' and must be used instead of [] because [] expands %variables%. 
-      @reg_hive.open(@reg_path) { |key| @value = key.read(@resource[:variable])[1] } 
+      # key.read returns '[type, data]' and must be used instead of [] because [] expands %variables%.
+      @reg_hive.open(@reg_path) { |key| @value = key.read(@resource[:variable])[1] }
     rescue Win32::Registry::Error => error
       if error.code == _ERROR_FILE_NOT_FOUND
         debug "Environment variable #{@resource[:variable]} not found"
@@ -156,7 +156,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     # be removed regardless of its position, i.e. use the 'insert' behavior
     # when removing in 'prepend' and 'append' modes. Otherwise, if the value
     # were in the variable but not at the beginning (prepend) or end (append),
-    # it would not be removed. 
+    # it would not be removed.
     if @resource[:ensure] == :absent && [:append, :prepend].include?(@resource[:mergemode])
       @resource[:mergemode] = :insert
     end
@@ -164,7 +164,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     case @resource[:mergemode]
     when :clobber
       # When 'ensure == absent' in clobber mode, we delete the variable itself, regardless of its content, so
-      # don't bother checking the content in this case. 
+      # don't bother checking the content in this case.
       @resource[:ensure] == :present ? @value == @resource[:value] : true
     when :insert
       # FIXME: this is a weird way to do this
@@ -176,9 +176,9 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
         indexes.each_cons(2).all? { |a, b| a && b && a < b }
       end
     when :append
-      @value.map { |x| x.downcase }[(-1 * @resource[:value].count)..-1] == @resource[:value].map { |x| x.downcase }
+      @value.map(&:downcase)[(-1 * @resource[:value].count)..-1] == @resource[:value].map(&:downcase)
     when :prepend
-      @value.map { |x| x.downcase }[0..(@resource[:value].count - 1)] == @resource[:value].map { |x| x.downcase }
+      @value.map(&:downcase)[0..(@resource[:value].count - 1)] == @resource[:value].map(&:downcase)
     end
   end
 
@@ -188,16 +188,14 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     # If the registry item doesn't exist yet, creation is always treated like
     # clobber mode, i.e. create the new reg item and populate it with
     # @resource[:value]
-    if not @value
-      @resource[:mergemode] = :clobber
-    end
+    @resource[:mergemode] = :clobber unless @value
 
     case @resource[:mergemode]
     when :clobber
       @reg_type = Win32::Registry::REG_SZ unless @reg_type
       begin
-        @reg_hive.create(@reg_path, Win32::Registry::KEY_ALL_ACCESS | Win32::Registry::KEY_WOW64_64KEY) do |key| 
-          key[@resource[:variable], @reg_type] = @resource[:value].join(@sep) 
+        @reg_hive.create(@reg_path, Win32::Registry::KEY_ALL_ACCESS | Win32::Registry::KEY_WOW64_64KEY) do |key|
+          key[@resource[:variable], @reg_type] = @resource[:value].join(@sep)
         end
       rescue Win32::Registry::Error => error
         reg_fail('creating', error)
@@ -232,8 +230,8 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
   def type
     # QueryValue returns '[type, value]'
-     current_type = @reg_hive.open(@reg_path) { |key| Win32::Registry::API.QueryValue(key.hkey, @resource[:variable]) }[0]
-     @reg_types.invert[current_type]
+    current_type = @reg_hive.open(@reg_path) { |key| Win32::Registry::API.QueryValue(key.hkey, @resource[:variable]) }[0]
+    @reg_types.invert[current_type]
   end
 
   def type=(newtype)
@@ -265,7 +263,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   end
 
   def reg_fail(action, error)
-    self.fail "#{action} '#{@reg_hive.name}:\\#{@reg_path}\\#{@resource[:variable]}' returned error #{error.code}: #{error.message}"
+    raise "#{action} '#{@reg_hive.name}:\\#{@reg_path}\\#{@resource[:variable]}' returned error #{error.code}: #{error.message}"
   end
 
   def remove_value
@@ -274,33 +272,33 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
   def key_write(&block)
     unless block_given?
-      if ! [nil, :nil, :undef].include?(@resource[:type]) && self.type != @resource[:type]
-        # It may be the case that #exists? returns false, but we're still not creating a
-        # new registry value (e.g. when mergmode => insert). In this case, the property getters/setters
-        # won't be called, so we'll go ahead and set type here manually. 
-        newtype = @reg_types[@resource[:type]]
-      else
-        newtype = @reg_types[self.type]
-      end
-        block = proc { |key| key[@resource[:variable], newtype] = @value.join(@sep) }
+      newtype = if ![nil, :nil, :undef].include?(@resource[:type]) && type != @resource[:type]
+                  # It may be the case that #exists? returns false, but we're still not creating a
+                  # new registry value (e.g. when mergmode => insert). In this case, the property getters/setters
+                  # won't be called, so we'll go ahead and set type here manually.
+                  @reg_types[@resource[:type]]
+                else
+                  @reg_types[type]
+                end
+      block = proc { |key| key[@resource[:variable], newtype] = @value.join(@sep) }
     end
-    @reg_hive.open(@reg_path, Win32::Registry::KEY_WRITE | Win32::Registry::KEY_WOW64_64KEY, &block) 
+    @reg_hive.open(@reg_path, Win32::Registry::KEY_WRITE | Win32::Registry::KEY_WOW64_64KEY, &block)
   rescue Win32::Registry::Error => error
     reg_fail('writing', error)
   end
 
   # Make new variable visible without logging off and on again. This really only makes sense
   # for debugging (i.e. with 'puppet agent -t') since you can only broadcast messages to your own
-  # windows, and not to those of other users. 
+  # windows, and not to those of other users.
   # see: http://stackoverflow.com/questions/190168/persisting-an-environment-variable-through-ruby/190437#190437
   def broadcast_changes
-    debug "Broadcasting changes to environment"
+    debug 'Broadcasting changes to environment'
     _HWND_BROADCAST = 0xFFFF
     _WM_SETTINGCHANGE = 0x1A
     self.class::WinAPI.SendMessageTimeout(_HWND_BROADCAST, _WM_SETTINGCHANGE, nil, 'Environment', 2, @resource[:broadcast_timeout], nil)
   end
 
-  # This is the best solution I found to (at least mostly) reliably locate a user's 
+  # This is the best solution I found to (at least mostly) reliably locate a user's
   # ntuser.dat: http://stackoverflow.com/questions/1059460/shgetfolderpath-for-a-specific-user
   def load_user_hive
     debug "Loading NTUSER.DAT for '#{@resource[:user]}'"
@@ -311,7 +309,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
         home_path = key['ProfileImagePath']
       end
     rescue Win32::Registry::Error => error
-      self.fail "Cannot find registry hive for user '#{@resource[:user]}'"
+      raise "Cannot find registry hive for user '#{@resource[:user]}'"
     end
 
     ntuser_path = File.join(home_path, 'NTUSER.DAT')
@@ -323,7 +321,6 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       end
     end
 
-    self.class.loaded_hives << { :user_sid => @user_sid, :username => @resource[:user] }
+    self.class.loaded_hives << { user_sid: @user_sid, username: @resource[:user] }
   end
 end
-

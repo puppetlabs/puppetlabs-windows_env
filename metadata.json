@@ -1,15 +1,21 @@
 {
-  "name": "badgerious-windows_env",
+  "name": "puppet-windows_env",
   "version": "2.2.2",
-  "author": "badgerious",
+  "author": "Vox Pupuli",
   "summary": "Manages Windows environment variables",
-  "license": "Apache License, Version 2.0",
-  "source": "git://github.com/badgerious/puppet-windows-env",
-  "project_page": "https://github.com/badgerious/puppet-windows-env",
-  "issues_url": "https://github.com/badgerious/puppet-windows-env/issues",
+  "license": "Apache-2.0",
+  "source": "https://github.com/voxpupuli/puppet-windows-env",
+  "project_page": "https://github.com/voxpupuli/puppet-windows-env",
+  "issues_url": "https://github.com/voxpupuli/puppet-windows-env/issues",
   "description": "Create, delete, and insert values into Windows environment variables",
   "dependencies": [
 
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 3.8.7 < 5.0.0"
+    }
   ],
   "operatingsystem_support": [
   {

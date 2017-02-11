@@ -3,12 +3,11 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:windows_env) do
-
   before do
     @class = described_class
     @provider_class = @class.provide(:fake) { mk_resource_methods }
     @provider = @provider_class.new
-    @resource = stub 'resource', :resource => nil, :provider => @provider
+    @resource = stub 'resource', resource: nil, provider: @provider
 
     @class.stubs(:defaultprovider).returns @provider_class
     @class.any_instance.stubs(:provider).returns @provider
@@ -16,23 +15,22 @@ describe Puppet::Type.type(:windows_env) do
 
   let(:keyattribute) { [:variable, :value, :user] }
 
-  it "should have a key attribute" do
+  it 'has a key attribute' do
     expect(@class.key_attributes).to eq(keyattribute)
   end
 
-  describe "when validating attributes" do
-
+  describe 'when validating attributes' do
     params = [
       :variable,
       :value,
       :user,
       :mergemode,
       :separator,
-      :broadcast_timeout,
+      :broadcast_timeout
     ]
 
     properties = [
-      :type,
+      :type
     ]
 
     params.each do |param|
@@ -46,15 +44,5 @@ describe Puppet::Type.type(:windows_env) do
         expect(@class.attrtype(param)).to eq(:property)
       end
     end
-
   end
-
 end
-
-
-
-
-
-
-
-

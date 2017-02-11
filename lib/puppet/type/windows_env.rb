@@ -1,5 +1,5 @@
 Puppet::Type.newtype(:windows_env) do
-  desc "Manages Windows environment variables"
+  desc 'Manages Windows environment variables'
 
   # Track resources that are managing the same environment variable so we can
   # detect mergemode/type conflicts
@@ -13,30 +13,30 @@ Puppet::Type.newtype(:windows_env) do
     @mergemode[user] ||= {}
     last = @mergemode[user][var]
     if (resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber)
-      fail "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})"
+      raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})"
     else
       @mergemode[user][var] = resource
     end
 
     # Cannot have two resources with different types on the same var
-    if ![nil, :undef].include?(resource[:type])
+    unless [nil, :undef].include?(resource[:type])
       @type[user] ||= {}
       last = @type[user][var]
       if last && last[:type] != resource[:type]
-        fail "Multiple resources are managing the same environment variable but their types do not agree (Offending resources: #{resource}, #{last})"
+        raise "Multiple resources are managing the same environment variable but their types do not agree (Offending resources: #{resource}, #{last})"
       else
         @type[user][var] = resource
       end
     end
   end
 
-  # title will look like "#{variable}=#{value}" (The '=' is not permitted in 
+  # title will look like "#{variable}=#{value}" (The '=' is not permitted in
   # environment variable names). If no '=' is present, user is giving only
   # the variable name (for deletion purposes, say, or to provide an array),
-  # so value will be set to nil (and possibly overridden later). 
+  # so value will be set to nil (and possibly overridden later).
   def self.title_patterns
-    [[/^(.*?)=(.*)$/, [[:variable, proc{|x| x}], [:value, proc{|x| x}]]],
-     [/^([^=]+)$/   , [[:variable, proc{|x| x}]]]]
+    [[%r{^(.*?)=(.*)$}, [[:variable, proc { |x| x }], [:value, proc { |x| x }]]],
+     [%r{^([^=]+)$}, [[:variable, proc { |x| x }]]]]
   end
 
   ensurable do
@@ -46,12 +46,12 @@ Puppet::Type.newtype(:windows_env) do
   end
 
   newparam(:variable) do
-    desc "The environment variable name"
+    desc 'The environment variable name'
     isnamevar
   end
 
   newparam(:value) do
-    desc "The environment variable value"
+    desc 'The environment variable value'
     isnamevar
 
     munge do |val|
@@ -64,29 +64,29 @@ Puppet::Type.newtype(:windows_env) do
   end
 
   newparam(:user) do
-    desc "Set the user whose environment will be modified"
+    desc 'Set the user whose environment will be modified'
     isnamevar
   end
 
   newparam(:mergemode) do
-    desc "How to set the value of the environment variable. E.g. replace existing value, append to existing value..."
+    desc 'How to set the value of the environment variable. E.g. replace existing value, append to existing value...'
     newvalues(:clobber, :insert, :append, :prepend)
     defaultto(:insert)
   end
 
   newparam(:separator) do
-    desc "How to separate environment variables with multiple values (e.g. PATH)"
+    desc 'How to separate environment variables with multiple values (e.g. PATH)'
     defaultto(';')
   end
 
   newparam(:broadcast_timeout) do
-    desc "Set the timeout (in ms) for environment refreshes. This is per top level window, so delay may be longer than provided value."
+    desc 'Set the timeout (in ms) for environment refreshes. This is per top level window, so delay may be longer than provided value.'
     validate do |val|
       begin
         val = Integer(val)
-        val > 0 or raise ArgumentError
-      rescue ArgumentError 
-        raise ArgumentError, "broadcast_timeout must be a valid positive integer"
+        val > 0 || raise(ArgumentError)
+      rescue ArgumentError
+        raise ArgumentError, 'broadcast_timeout must be a valid positive integer'
       end
     end
     munge { |val| Integer(val) }
@@ -100,11 +100,11 @@ Puppet::Type.newtype(:windows_env) do
 
   validate do
     if self[:ensure] == :present && [nil, :undef].include?(self[:value])
-      fail "'value' parameter must be provided when 'ensure => present'"
+      raise "'value' parameter must be provided when 'ensure => present'"
     end
     if self[:ensure] == :absent && [nil, :undef].include?(self[:value]) &&
-      [:prepend, :append, :insert].include?(self[:mergemode])
-      fail "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{self[:mergemode]}'"
+       [:prepend, :append, :insert].include?(self[:mergemode])
+      raise "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{self[:mergemode]}'"
     end
 
     self.class.check_collisions(self)

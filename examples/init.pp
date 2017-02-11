@@ -1,4 +1,3 @@
-class windows_env {
   ### SHOULD FAIL ###
 
   # ensure => present, but no value
@@ -6,8 +5,8 @@ class windows_env {
 
   # ensure => absent, mergemode => insert, but no value
   windows_env { 'SHOULD_FAIL2':
+    ensure    =>  absent,
     mergemode => insert,
-    ensure    => absent,
   }
 
   # nonexistent user
@@ -65,21 +64,21 @@ class windows_env {
 
   # Should create a variable 'DELETME', and then delete it. 
   windows_env { 'DELETEME1':
+    ensure    =>  present,
     mergemode => clobber,
-    ensure    => present,
     value     => '',
     variable  => 'DELETEME',
   }->
   windows_env { 'DELETEME2':
+    ensure    =>  absent,
     mergemode => clobber,
-    ensure    => absent,
     variable  => 'DELETEME',
   }
 
   # Should remove 'C:\path' from PATH. 
   windows_env { 'DELETEME3':
-    variable => 'PATH',
     ensure   => absent,
+    variable => 'PATH',
     value    => 'C:\path',
   }
 
@@ -90,8 +89,6 @@ class windows_env {
 
   # Should remove 'C:\badcode\bin' from Administrator account's PATH. 
   windows_env { 'PATH=C:\badcode\bin':
+    ensure =>  absent,
     user   => 'Administrator',
-    ensure => absent,
   }
-}
-

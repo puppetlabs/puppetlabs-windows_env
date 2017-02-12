@@ -1,6 +1,6 @@
 {
   "name": "puppet-windows_env",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "author": "Vox Pupuli",
   "summary": "Manages Windows environment variables",
   "license": "Apache-2.0",

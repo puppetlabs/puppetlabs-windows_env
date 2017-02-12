@@ -12,22 +12,16 @@ Puppet::Type.newtype(:windows_env) do
     # Cannot have two resources in clobber mode on the same var
     @mergemode[user] ||= {}
     last = @mergemode[user][var]
-    if (resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber)
-      raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})"
-    else
-      @mergemode[user][var] = resource
-    end
+    raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})" if (resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber)
+    @mergemode[user][var] = resource
 
     # Cannot have two resources with different types on the same var
-    unless [nil, :undef].include?(resource[:type])
-      @type[user] ||= {}
-      last = @type[user][var]
-      if last && last[:type] != resource[:type]
-        raise "Multiple resources are managing the same environment variable but their types do not agree (Offending resources: #{resource}, #{last})"
-      else
-        @type[user][var] = resource
-      end
-    end
+    return if [nil, :undef].include?(resource[:type])
+
+    @type[user] ||= {}
+    last = @type[user][var]
+    raise "Multiple resources are managing the same environment variable but their types do not agree (Offending resources: #{resource}, #{last})" if last && last[:type] != resource[:type]
+    @type[user][var] = resource
   end
 
   # title will look like "#{variable}=#{value}" (The '=' is not permitted in

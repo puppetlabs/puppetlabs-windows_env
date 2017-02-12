@@ -44,6 +44,13 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   confine osfamily: :windows
   defaultfor osfamily: :windows
 
+  # For testing registry open result
+  ERROR_FILE_NOT_FOUND = 2
+
+  # For broadcasting environment changes
+  HWND_BROADCAST = 0xFFFF
+  WM_SETTINGCHANGE = 0x1A
+
   # The 'windows_env' feature includes FFI.  Here we need to be able to fully
   # load the provider even if FFI is absent so that the catalog can continue
   # (and hopefully install FFI).
@@ -105,15 +112,12 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
         user_sid = hash[:user_sid]
         username = hash[:username]
         debug "Unloading NTUSER.DAT for '#{username}'"
-        result = self::WinAPI.RegUnLoadKey(Win32::Registry::HKEY_USERS.hkey, user_sid)
+        self::WinAPI.RegUnLoadKey(Win32::Registry::HKEY_USERS.hkey, user_sid)
       end
     end
   end
 
   def exists?
-    # For testing registry open result
-    _ERROR_FILE_NOT_FOUND = 2
-
     if @resource[:user]
       @reg_hive = Win32::Registry::HKEY_USERS
       @user_sid = name_to_sid(@resource[:user])
@@ -123,7 +127,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       begin
         @reg_hive.open(@reg_path) {}
       rescue Win32::Registry::Error => error
-        if error.code == _ERROR_FILE_NOT_FOUND
+        if error.code == ERROR_FILE_NOT_FOUND
           load_user_hive
         else
           reg_fail("Can't access Environment for user '#{@resource[:user]}'. Opening", error)
@@ -143,7 +147,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       # key.read returns '[type, data]' and must be used instead of [] because [] expands %variables%.
       @reg_hive.open(@reg_path) { |key| @value = key.read(@resource[:variable])[1] }
     rescue Win32::Registry::Error => error
-      if error.code == _ERROR_FILE_NOT_FOUND
+      if error.code == ERROR_FILE_NOT_FOUND
         debug "Environment variable #{@resource[:variable]} not found"
         return false
       end
@@ -169,7 +173,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     when :insert
       # FIXME: this is a weird way to do this
       # verify all elements are present and they appear in the correct order
-      indexes = @resource[:value].map { |x| @value.find_index { |y| x.casecmp(y) == 0 } }
+      indexes = @resource[:value].map { |x| @value.find_index { |y| x.casecmp(y).zero? } }
       if indexes.count == 1
         indexes == [nil] ? false : true
       else
@@ -251,6 +255,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       use_util_windows_sid = true
     end
   rescue LoadError
+    use_util_windows_sid = false
   end
   if use_util_windows_sid
     def name_to_sid(name)
@@ -267,7 +272,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   end
 
   def remove_value
-    @value = @value.delete_if { |x| @resource[:value].find { |y| y.casecmp(x) == 0 } }
+    @value = @value.delete_if { |x| @resource[:value].find { |y| y.casecmp(x).zero? } }
   end
 
   def key_write(&block)
@@ -293,9 +298,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   # see: http://stackoverflow.com/questions/190168/persisting-an-environment-variable-through-ruby/190437#190437
   def broadcast_changes
     debug 'Broadcasting changes to environment'
-    _HWND_BROADCAST = 0xFFFF
-    _WM_SETTINGCHANGE = 0x1A
-    self.class::WinAPI.SendMessageTimeout(_HWND_BROADCAST, _WM_SETTINGCHANGE, nil, 'Environment', 2, @resource[:broadcast_timeout], nil)
+    self.class::WinAPI.SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, nil, 'Environment', 2, @resource[:broadcast_timeout], nil)
   end
 
   # This is the best solution I found to (at least mostly) reliably locate a user's
@@ -309,14 +312,14 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
         home_path = key['ProfileImagePath']
       end
     rescue Win32::Registry::Error => error
-      raise "Cannot find registry hive for user '#{@resource[:user]}'"
+      raise "Cannot find registry hive for user '#{@resource[:user]}': #{error.message}"
     end
 
     ntuser_path = File.join(home_path, 'NTUSER.DAT')
 
     Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
       result = self.class::WinAPI.RegLoadKey(Win32::Registry::HKEY_USERS.hkey, @user_sid, ntuser_path)
-      unless result == 0
+      unless result.zero?
         raise Puppet::Util::Windows::Error.new("Could not load registry hive for user '#{@resource[:user]}'", result)
       end
     end

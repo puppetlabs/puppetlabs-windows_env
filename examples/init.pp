@@ -57,8 +57,8 @@
   }
 
   # should create an environment variable 'VARGUY', then insert a new value and change its type
-  windows_env { 'VARGUY=C:\hello': }->
-  windows_env { 'VARGUY=C:\byebye':
+  windows_env { 'VARGUY=C:\hello': }
+  -> windows_env { 'VARGUY=C:\byebye':
     type => REG_EXPAND_SZ,
   }
 
@@ -68,8 +68,8 @@
     mergemode => clobber,
     value     => '',
     variable  => 'DELETEME',
-  }->
-  windows_env { 'DELETEME2':
+  }
+  -> windows_env { 'DELETEME2':
     ensure    =>  absent,
     mergemode => clobber,
     variable  => 'DELETEME',

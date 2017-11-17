@@ -1,12 +1,12 @@
 {
   "name": "puppet-windows_env",
-  "version": "3.0.0-rc0",
+  "version": "3.0.0",
   "author": "Vox Pupuli",
   "summary": "Manages Windows environment variables",
   "license": "Apache-2.0",
-  "source": "https://github.com/voxpupuli/puppet-windows-env",
-  "project_page": "https://github.com/voxpupuli/puppet-windows-env",
-  "issues_url": "https://github.com/voxpupuli/puppet-windows-env/issues",
+  "source": "https://github.com/voxpupuli/puppet-windows_env",
+  "project_page": "https://github.com/voxpupuli/puppet-windows_env",
+  "issues_url": "https://github.com/voxpupuli/puppet-windows_env/issues",
   "description": "Create, delete, and insert values into Windows environment variables",
   "dependencies": [
 

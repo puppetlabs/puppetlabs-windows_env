@@ -29,8 +29,8 @@ Puppet::Type.newtype(:windows_env) do
   # the variable name (for deletion purposes, say, or to provide an array),
   # so value will be set to nil (and possibly overridden later).
   def self.title_patterns
-    [[%r{^(.*?)=(.*)$}, [[:variable, proc { |x| x }], [:value, proc { |x| x }]]],
-     [%r{^([^=]+)$}, [[:variable, proc { |x| x }]]]]
+    [[%r{^(.*?)=(.*)$}, [[:variable], [:value]]],
+     [%r{^([^=]+)$}, [[:variable]]]]
   end
 
   ensurable do

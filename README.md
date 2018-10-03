@@ -194,7 +194,47 @@ or refresh their environment by some other means.
       subscribe   => Windows_env['KOOLVAR'],
       refreshonly => true,
     }
+```
 
+## Facts
+
+### `windows_env`
+
+A structured fact which lists the following Windows environment variables
+
+- ALLUSERSPROFILE
+- APPDATA
+- COMMONPROGRAMFILES
+- COMMONPROGRAMFILES(X86)
+- HOME
+- HOMEDRIVE
+- HOMEPATH
+- LOCALAPPDATA
+- PATHEXT
+- PROCESSOR_IDENTIFIER
+- PROCESSOR_LEVEL
+- PROCESSOR_REVISION
+- PROGRAMDATA
+- PROGRAMFILES
+- PROGRAMFILES(X86)
+- PSMODULEPATH
+- PUBLIC
+- SYSTEMDRIVE
+- SYSTEMROOT
+- TEMP
+- TMP
+- USERPROFILE
+- WINDIR
+
+Note that the names will appear as uppercase in the fact, for example the `windir` environment variable will appears as `WINDIR` in the fact
+
+### Examples
+
+```puppet
+    $app_data = $facts['windows_env']['APPDATA']
+
+    # Output the AppData path in the puppet log
+    notify { $app_data: }
 ```
 
 ## Acknowledgements

@@ -1,22 +1,6 @@
 ---
 .travis.yml:
   secure: "c9YX264FSWWS91dqRlHCysnLZwM/bU3xA5+ks4p5UpSFCoVrXW/oJELelRPbOXf+9uhCwQuUtYPyG6GdjRkSOjYFFOrG6U0nlpFmXBq2NihJKgRXKeSCyOqtIs7/YKpcwh2FC2BEfPhr9+5aVJCZB5tVWgTe5MRzfUM0JJNmt2Uc/78SboOCM1rStFhw6QSr+wBJL8YhY/V5L8JI6ySJucESumaNccG3ati/XGFGFddAcgAyGC3S7/aXZExr1TtV5S47yKhZ2rTqF1D93YpeAtC/qGxAVENHDRqZ+JbZXjd7rAhjBQIm0RrkzEo/e1/erxNuJBwZ99/ypjXdP0G5ME0Y7cdNQMvPGzHrI5LdZgGw8g/soOOsjrVasloHKB2k9A4ZJ563NcCPs552x8jTA0342ZMvowQ5DZkj2ccmP49XsbkefS1c/Oom3TGsZRXKmyya37Aliggz73ENQybTZ8CUYzuaiNtwouhzaSjulLMTimW4q2bR7T/c7MMdYcPtv6/qPShdZgYvqnJ3KOvtaB3vJzat+EMJlvya5CrgcmsdiRtChJb3PBJ/G2FnikKW93SRcj9zKsVXgGIeyzDNR/V/sKUyEHSholL5FqPHK77TU5lF2ejyEAzOg3pkZN9FFJijdBiUIMrZr55NzUZpuLooagtXsl6LDR1KG+SMWVs="
-spec/acceptance/nodesets/docker/centos-5.yml:
-  delete: true
-spec/acceptance/nodesets/docker/centos-6.yml:
-  delete: true
-spec/acceptance/nodesets/docker/centos-7.yml:
-  delete: true
-spec/acceptance/nodesets/docker/debian-7.yml:
-  delete: true
-spec/acceptance/nodesets/docker/debian-8.yml:
-  delete: true
-spec/acceptance/nodesets/docker/ubuntu-12.04.yml:
-  delete: true
-spec/acceptance/nodesets/docker/ubuntu-14.04.yml:
-  delete: true
-spec/acceptance/nodesets/docker/ubuntu-16.04.yml:
-  delete: true
 spec/acceptance/nodesets/ec2/amazonlinux-2016091.yml:
   delete: true
 spec/acceptance/nodesets/ec2/rhel-73-x64.yml:
@@ -26,30 +10,4 @@ spec/acceptance/nodesets/ec2/sles-12sp2-x64.yml:
 spec/acceptance/nodesets/ec2/ubuntu-1604-x64.yml:
   delete: true
 spec/acceptance/nodesets/archlinux-2-x64.yml:
-  delete: true
-spec/acceptance/nodesets/centos-6-x64.yml:
-  delete: true
-spec/acceptance/nodesets/centos-7-x64.yml:
-  delete: true
-spec/acceptance/nodesets/centos-66-x64-pe.yml:
-  delete: true
-spec/acceptance/nodesets/centos-66-x64.yml:
-  delete: true
-spec/acceptance/nodesets/centos-72-x64.yml:
-  delete: true
-spec/acceptance/nodesets/centos-511-x64.yml:
-  delete: true
-spec/acceptance/nodesets/debian-78-x64.yml:
-  delete: true
-spec/acceptance/nodesets/debian-82-x64.yml:
-  delete: true
-spec/acceptance/nodesets/fedora-24-x64.yml:
-  delete: true
-spec/acceptance/nodesets/fedora-25-x64.yml:
-  delete: true
-spec/acceptance/nodesets/ubuntu-server-1204-x64.yml:
-  delete: true
-spec/acceptance/nodesets/ubuntu-server-1404-x64.yml:
-  delete: true
-spec/acceptance/nodesets/ubuntu-server-1604-x64.yml:
   delete: true

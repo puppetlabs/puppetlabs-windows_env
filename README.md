@@ -15,7 +15,7 @@ puppet module install puppet/windows_env
 Install from git (do this in your modulepath):
 
 ```sh
-git clone https://github.com/puppet/puppet-windows-env windows_env
+git clone https://github.com/voxpupuli/puppet-windows_env windows_env
 ```
 
 ## Changes

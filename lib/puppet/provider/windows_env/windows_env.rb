@@ -61,16 +61,16 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       ffi_convention :stdcall
 
       ffi_lib :User32
-      attach_function :SendMessageTimeout, :SendMessageTimeoutA, [:uintptr_t, :uint, :pointer, :pointer, :uint, :uint, :pointer], :pointer
+      attach_function :SendMessageTimeout, :SendMessageTimeoutA, %i[uintptr_t uint pointer pointer uint uint pointer], :pointer
 
       ffi_lib :Advapi32
-      attach_function :RegLoadKey, :RegLoadKeyA, [:uintptr_t, :pointer, :pointer], :long
-      attach_function :RegUnLoadKey, :RegUnLoadKeyA, [:uintptr_t, :pointer], :long
+      attach_function :RegLoadKey, :RegLoadKeyA, %i[uintptr_t pointer pointer], :long
+      attach_function :RegUnLoadKey, :RegUnLoadKeyA, %i[uintptr_t pointer], :long
 
       # Ruby < 1.9 doesn't know about encoding.
       if defined?(::Encoding)
         # Workaround for https://bugs.ruby-lang.org/issues/10820 .
-        attach_function :RegDeleteValue, :RegDeleteValueW, [:uintptr_t, :buffer_in], :long
+        attach_function :RegDeleteValue, :RegDeleteValueW, %i[uintptr_t buffer_in], :long
 
         # Borrowed from Puppet core. Duplicated for old version compatibilty.
         def self.from_string_to_wide_string(str)
@@ -161,7 +161,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     # when removing in 'prepend' and 'append' modes. Otherwise, if the value
     # were in the variable but not at the beginning (prepend) or end (append),
     # it would not be removed.
-    if @resource[:ensure] == :absent && [:append, :prepend].include?(@resource[:mergemode])
+    if @resource[:ensure] == :absent && %i[append prepend].include?(@resource[:mergemode])
       @resource[:mergemode] = :insert
     end
 

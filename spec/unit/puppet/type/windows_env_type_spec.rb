@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Puppet::Type.type(:windows_env) do
   let(:type) { described_class }
-  let(:keyattribute) { [:variable, :value, :user] }
+  let(:keyattribute) { %i[variable value user] }
 
   it 'has a key attribute' do
     expect(type.key_attributes).to eq(keyattribute)
@@ -26,13 +26,13 @@ describe Puppet::Type.type(:windows_env) do
   end
 
   describe 'when validating attributes' do
-    params = [
-      :variable,
-      :value,
-      :user,
-      :mergemode,
-      :separator,
-      :broadcast_timeout
+    params = %i[
+      variable
+      value
+      user
+      mergemode
+      separator
+      broadcast_timeout
     ]
 
     properties = [

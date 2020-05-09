@@ -97,7 +97,7 @@ Puppet::Type.newtype(:windows_env) do
       raise "'value' parameter must be provided when 'ensure => present'"
     end
     if self[:ensure] == :absent && [nil, :undef].include?(self[:value]) &&
-       %i[prepend append insert].include?(self[:mergemode])
+       [:prepend, :append, :insert].include?(self[:mergemode])
       raise "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{self[:mergemode]}'"
     end
 

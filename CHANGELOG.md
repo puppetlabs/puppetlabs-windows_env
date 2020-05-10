@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v4.0.0](https://github.com/voxpupuli/puppet-windows_env/tree/v4.0.0) (2020-05-09)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v3.2.0...v4.0.0)
+
+**Breaking changes:**
+
+- modulesync 2.7.0 and drop puppet 4 [\#60](https://github.com/voxpupuli/puppet-windows_env/pull/60) ([bastelfreak](https://github.com/bastelfreak))
+
+**Closed issues:**
+
+- Add a set of domain related facts [\#61](https://github.com/voxpupuli/puppet-windows_env/issues/61)
+- Update Readme and remove references to badgerious [\#31](https://github.com/voxpupuli/puppet-windows_env/issues/31)
+
+**Merged pull requests:**
+
+- Fixed github url in README.md [\#64](https://github.com/voxpupuli/puppet-windows_env/pull/64) ([skrysmanski](https://github.com/skrysmanski))
+- Remove Linux acceptance nodesets [\#57](https://github.com/voxpupuli/puppet-windows_env/pull/57) ([ekohl](https://github.com/ekohl))
+
 ## [v3.2.0](https://github.com/voxpupuli/puppet-windows_env/tree/v3.2.0) (2018-10-20)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v3.1.1...v3.2.0)

@@ -7,7 +7,7 @@ if Puppet.features.microsoft_windows?
   require 'win32/registry'
   module Win32
     class Registry
-      KEY_WOW64_64KEY = 0x0100 unless defined?(KEY_WOW64_64KEY)
+      KEY_WOW64_64KEY = 0x0100
     end
   end
 end

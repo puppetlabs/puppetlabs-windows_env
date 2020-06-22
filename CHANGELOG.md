@@ -4,7 +4,15 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
-## [v4.0.0](https://github.com/voxpupuli/puppet-windows_env/tree/v4.0.0) (2020-05-09)
+## [v4.0.1](https://github.com/voxpupuli/puppet-windows_env/tree/v4.0.1) (2020-06-22)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v4.0.0...v4.0.1)
+
+**Fixed bugs:**
+
+- Fix: Could not set 'present' on ensure: uninitialized constant Win32::Registry::KEY\_WOW64\_64KEY [\#70](https://github.com/voxpupuli/puppet-windows_env/pull/70) ([cmchoi2000](https://github.com/cmchoi2000))
+
+## [v4.0.0](https://github.com/voxpupuli/puppet-windows_env/tree/v4.0.0) (2020-05-10)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v3.2.0...v4.0.0)
 

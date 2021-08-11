@@ -1,10 +1,8 @@
 # puppet-windows_env
 
-
 This module manages (system and user) Windows environment variables.
 
 ## Installation
-
 
 Install from puppet forge:
 
@@ -51,7 +49,7 @@ depends on `mergemode`.
 
 The user whose environment will be modified. Default is `undef`, i.e. system
 environment. The user can be local or domain, as long as they have a local
-profile (typically `C:\users\{username}` on Vista+).  There is no awareness of
+profile (typically `C:\users\{username}` on Vista+). There is no awareness of
 network profiles in this module; knowing how changes to the local profile will
 affect a distributed profile is up to you.
 
@@ -91,7 +89,7 @@ Valid values:
     Note that with multiple `prepend`s on the same resource, there will be
     shuffling around on every puppet run, since each resource will place its own
     value at the front of the list when it is run. Alternatively, an array can be
-    provided to `value`.  The relative ordering of the array items will be
+    provided to `value`. The relative ordering of the array items will be
     maintained when they are inserted into the variable, and the shuffling will
     be avoided.
 - `append`
@@ -155,10 +153,10 @@ or refresh their environment by some other means.
       mergemode => clobber,
     }
 
-    # Variables with 'type => REG_EXPAND_SZ' allow other environment variables to be used
+    # Variables with type => 'REG_EXPAND_SZ' allow other environment variables to be used
     # by enclosing them in percent symbols.
     windows_env { 'JAVA_HOME=%ProgramFiles%\Java\jdk1.6.0_02':
-      type => REG_EXPAND_SZ,
+      type => 'REG_EXPAND_SZ',
     }
 
     # Create an environment variable for 'Administrator':

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Depending on puppet version, this feature may or may not include the libraries needed, but
 # if some of them are present, the others should be too. This check prevents errors from
 # non Windows nodes that have had this module pluginsynced to them.
@@ -29,8 +31,8 @@ if Puppet.version < '3.4.0'
         evaluate_orig_windows_env
         begin
           Puppet::Type::Windows_env::ProviderWindows_env.post_resource_eval
-        rescue => detail
-          Puppet.log_exception(detail, 'post_resource_eval failed for provider windows_env')
+        rescue StandardError => e
+          Puppet.log_exception(e, 'post_resource_eval failed for provider windows_env')
         end
       end
     end
@@ -61,16 +63,16 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       ffi_convention :stdcall
 
       ffi_lib :User32
-      attach_function :SendMessageTimeout, :SendMessageTimeoutA, [:uintptr_t, :uint, :pointer, :pointer, :uint, :uint, :pointer], :pointer
+      attach_function :SendMessageTimeout, :SendMessageTimeoutA, %i[uintptr_t uint pointer pointer uint uint pointer], :pointer
 
       ffi_lib :Advapi32
-      attach_function :RegLoadKey, :RegLoadKeyA, [:uintptr_t, :pointer, :pointer], :long
-      attach_function :RegUnLoadKey, :RegUnLoadKeyA, [:uintptr_t, :pointer], :long
+      attach_function :RegLoadKey, :RegLoadKeyA, %i[uintptr_t pointer pointer], :long
+      attach_function :RegUnLoadKey, :RegUnLoadKeyA, %i[uintptr_t pointer], :long
 
       # Ruby < 1.9 doesn't know about encoding.
       if defined?(::Encoding)
         # Workaround for https://bugs.ruby-lang.org/issues/10820 .
-        attach_function :RegDeleteValue, :RegDeleteValueW, [:uintptr_t, :buffer_in], :long
+        attach_function :RegDeleteValue, :RegDeleteValueW, %i[uintptr_t buffer_in], :long
 
         # Borrowed from Puppet core. Duplicated for old version compatibilty.
         def self.from_string_to_wide_string(str)
@@ -126,11 +128,11 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
       begin
         @reg_hive.open(@reg_path) {}
-      rescue Win32::Registry::Error => error
-        if error.code == ERROR_FILE_NOT_FOUND
+      rescue Win32::Registry::Error => e
+        if e.code == ERROR_FILE_NOT_FOUND
           load_user_hive
         else
-          reg_fail("Can't access Environment for user '#{@resource[:user]}'. Opening", error)
+          reg_fail("Can't access Environment for user '#{@resource[:user]}'. Opening", e)
         end
       end
     else
@@ -146,12 +148,12 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     begin
       # key.read returns '[type, data]' and must be used instead of [] because [] expands %variables%.
       @reg_hive.open(@reg_path) { |key| @value = key.read(@resource[:variable])[1] }
-    rescue Win32::Registry::Error => error
-      if error.code == ERROR_FILE_NOT_FOUND
+    rescue Win32::Registry::Error => e
+      if e.code == ERROR_FILE_NOT_FOUND
         debug "Environment variable #{@resource[:variable]} not found"
         return false
       end
-      reg_fail('reading', error)
+      reg_fail('reading', e)
     end
 
     @value = @value.split(@sep)
@@ -161,9 +163,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
     # when removing in 'prepend' and 'append' modes. Otherwise, if the value
     # were in the variable but not at the beginning (prepend) or end (append),
     # it would not be removed.
-    if @resource[:ensure] == :absent && [:append, :prepend].include?(@resource[:mergemode])
-      @resource[:mergemode] = :insert
-    end
+    @resource[:mergemode] = :insert if @resource[:ensure] == :absent && %i[append prepend].include?(@resource[:mergemode])
 
     case @resource[:mergemode]
     when :clobber
@@ -175,7 +175,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       # verify all elements are present and they appear in the correct order
       indexes = @resource[:value].map { |x| @value.find_index { |y| x.casecmp(y).zero? } }
       if indexes.count == 1
-        indexes == [nil] ? false : true
+        indexes != [nil]
       else
         indexes.each_cons(2).all? { |a, b| a && b && a < b }
       end
@@ -196,20 +196,20 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
 
     case @resource[:mergemode]
     when :clobber
-      @reg_type = Win32::Registry::REG_SZ unless @reg_type
+      @reg_type ||= Win32::Registry::REG_SZ
       begin
         @reg_hive.create(@reg_path, Win32::Registry::KEY_ALL_ACCESS | Win32::Registry::KEY_WOW64_64KEY) do |key|
           key[@resource[:variable], @reg_type] = @resource[:value].join(@sep)
         end
-      rescue Win32::Registry::Error => error
-        reg_fail('creating', error)
+      rescue Win32::Registry::Error => e
+        reg_fail('creating', e)
       end
     # the position at which the new value will be inserted when using insert is
     # arbitrary, so may as well group it with append.
     when :insert, :append
       # delete if already in the string and move to end.
       remove_value
-      @value = @value.concat(@resource[:value])
+      @value.concat(@resource[:value])
       key_write
     when :prepend
       # delete if already in the string and move to front
@@ -252,9 +252,7 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   if Puppet.features.microsoft_windows?
     begin
       require 'puppet/util/windows/sid'
-      if Puppet::Util::Windows::SID.respond_to?(:name_to_sid)
-        use_util_windows_sid = true
-      end
+      use_util_windows_sid = true if Puppet::Util::Windows::SID.respond_to?(:name_to_sid)
     rescue LoadError
       use_util_windows_sid = false
     end
@@ -290,8 +288,8 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       block = proc { |key| key[@resource[:variable], newtype] = @value.join(@sep) }
     end
     @reg_hive.open(@reg_path, Win32::Registry::KEY_WRITE | Win32::Registry::KEY_WOW64_64KEY, &block)
-  rescue Win32::Registry::Error => error
-    reg_fail('writing', error)
+  rescue Win32::Registry::Error => e
+    reg_fail('writing', e)
   end
 
   # Make new variable visible without logging off and on again. This really only makes sense
@@ -313,17 +311,15 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
       Win32::Registry::HKEY_LOCAL_MACHINE.open("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\#{@user_sid}") do |key|
         home_path = key['ProfileImagePath']
       end
-    rescue Win32::Registry::Error => error
-      raise "Cannot find registry hive for user '#{@resource[:user]}': #{error.message}"
+    rescue Win32::Registry::Error => e
+      raise "Cannot find registry hive for user '#{@resource[:user]}': #{e.message}"
     end
 
     ntuser_path = File.join(home_path, 'NTUSER.DAT')
 
     Puppet::Util::Windows::Security.with_privilege(Puppet::Util::Windows::Security::SE_RESTORE_NAME) do
       result = self.class::WinAPI.RegLoadKey(Win32::Registry::HKEY_USERS.hkey, @user_sid, ntuser_path)
-      unless result.zero?
-        raise Puppet::Util::Windows::Error.new("Could not load registry hive for user '#{@resource[:user]}'", result)
-      end
+      raise Puppet::Util::Windows::Error.new("Could not load registry hive for user '#{@resource[:user]}'", result) unless result.zero?
     end
 
     self.class.loaded_hives << { user_sid: @user_sid, username: @resource[:user] }

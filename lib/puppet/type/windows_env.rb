@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Puppet::Type.newtype(:windows_env) do
   desc 'Manages Windows environment variables'
 
@@ -13,6 +15,7 @@ Puppet::Type.newtype(:windows_env) do
     @mergemode[user] ||= {}
     last = @mergemode[user][var]
     raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})" if (!last.nil? && last.catalog == resource.catalog) && ((resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber))
+
     @mergemode[user][var] = resource
 
     # Cannot have two resources with different types on the same var
@@ -21,6 +24,7 @@ Puppet::Type.newtype(:windows_env) do
     @type[user] ||= {}
     last = @type[user][var]
     raise "Multiple resources are managing the same environment variable but their types do not agree (Offending resources: #{resource}, #{last})" if last && last[:type] != resource[:type]
+
     @type[user][var] = resource
   end
 
@@ -49,10 +53,10 @@ Puppet::Type.newtype(:windows_env) do
     isnamevar
 
     munge do |val|
-      if val.class != Array
-        [val]
-      else
+      if val.instance_of?(Array)
         val
+      else
+        [val]
       end
     end
   end
@@ -76,12 +80,10 @@ Puppet::Type.newtype(:windows_env) do
   newparam(:broadcast_timeout) do
     desc 'Set the timeout (in ms) for environment refreshes. This is per top level window, so delay may be longer than provided value.'
     validate do |val|
-      begin
-        val = Integer(val)
-        val > 0 || raise(ArgumentError)
-      rescue ArgumentError
-        raise ArgumentError, 'broadcast_timeout must be a valid positive integer'
-      end
+      val = Integer(val)
+      val.positive? || raise(ArgumentError)
+    rescue ArgumentError
+      raise ArgumentError, 'broadcast_timeout must be a valid positive integer'
     end
     munge { |val| Integer(val) }
     defaultto(100)
@@ -93,11 +95,9 @@ Puppet::Type.newtype(:windows_env) do
   end
 
   validate do
-    if self[:ensure] == :present && [nil, :undef].include?(self[:value])
-      raise "'value' parameter must be provided when 'ensure => present'"
-    end
+    raise "'value' parameter must be provided when 'ensure => present'" if self[:ensure] == :present && [nil, :undef].include?(self[:value])
     if self[:ensure] == :absent && [nil, :undef].include?(self[:value]) &&
-       [:prepend, :append, :insert].include?(self[:mergemode])
+       %i[prepend append insert].include?(self[:mergemode])
       raise "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{self[:mergemode]}'"
     end
 

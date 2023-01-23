@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Facter.add('windows_env') do
   confine osfamily: :windows
   setcode do

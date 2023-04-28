@@ -8,13 +8,11 @@
   "project_page": "https://github.com/voxpupuli/puppet-windows_env",
   "issues_url": "https://github.com/voxpupuli/puppet-windows_env/issues",
   "description": "Create, delete, and insert values into Windows environment variables",
-  "dependencies": [
-
-  ],
+  "dependencies": [],
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 6.1.0 < 8.0.0"
+      "version_requirement": ">= 7.0.0 < 8.0.0"
     }
   ],
   "operatingsystem_support": [

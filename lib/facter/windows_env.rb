@@ -34,9 +34,9 @@ Facter.add('windows_env') do
 
     result = {}
     env_hash = Puppet::Util::Windows::Process.get_environment_strings
-    env_hash.keys.
-      select { |key| whitelist.include?(key.upcase) }.
-      each { |key| result[key.upcase] = env_hash[key] }
+    env_hash.keys
+            .select { |key| whitelist.include?(key.upcase) }
+            .each { |key| result[key.upcase] = env_hash[key] }
     result
   end
 end

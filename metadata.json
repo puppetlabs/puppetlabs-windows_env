@@ -1,14 +1,18 @@
 {
   "name": "puppet-windows_env",
   "version": "4.0.2-rc0",
-  "author": "Vox Pupuli",
+  "author": "puppetlabs",
   "summary": "Manages Windows environment variables",
   "license": "Apache-2.0",
-  "source": "https://github.com/voxpupuli/puppet-windows_env",
-  "project_page": "https://github.com/voxpupuli/puppet-windows_env",
-  "issues_url": "https://github.com/voxpupuli/puppet-windows_env/issues",
-  "description": "Create, delete, and insert values into Windows environment variables",
-  "dependencies": [],
+  "source": "https://github.com/puppetlabs/puppetlabs-windows_env",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-windows_env",
+  "issues_url": "https://github.com/puppetlabs/puppetlabs-windows_env/issues",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 8.4.0 < 10.0.0"
+    }
+  ],
   "requirements": [
     {
       "name": "puppet",
@@ -17,7 +21,15 @@
   ],
   "operatingsystem_support": [
     {
-      "operatingsystem": "Windows"
+      "operatingsystem": "Windows",
+      "operatingsystemrelease": [
+        "2016",
+        "2019",
+        "2022"
+      ]
     }
-  ]
+  ],
+  "pdk-version": "2.7.1",
+  "template-url": "https://github.com/puppetlabs/pdk-templates.git#main",
+  "template-ref": "tags/2.7.5-0-ge5b0114"
 }

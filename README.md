@@ -1,14 +1,7 @@
-# puppet-windows_env
+# windows_env
 
-[![Build Status](https://github.com/voxpupuli/puppet-windows_env/workflows/CI/badge.svg)](https://github.com/voxpupuli/puppet-windows_env/actions?query=workflow%3ACI)
-[![Release](https://github.com/voxpupuli/puppet-windows_env/actions/workflows/release.yml/badge.svg)](https://github.com/voxpupuli/puppet-windows_env/actions/workflows/release.yml)
-[![Puppet Forge](https://img.shields.io/puppetforge/v/puppet/windows_env.svg)](https://forge.puppetlabs.com/puppet/windows_env)
-[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/puppet/windows_env.svg)](https://forge.puppetlabs.com/puppet/windows_env)
-[![Puppet Forge - endorsement](https://img.shields.io/puppetforge/e/puppet/windows_env.svg)](https://forge.puppetlabs.com/puppet/windows_env)
-[![Puppet Forge - scores](https://img.shields.io/puppetforge/f/puppet/windows_env.svg)](https://forge.puppetlabs.com/puppet/windows_env)
-[![puppetmodule.info docs](http://www.puppetmodule.info/images/badge.png)](http://www.puppetmodule.info/m/puppet-windows_env)
-[![Apache-2 License](https://img.shields.io/github/license/voxpupuli/puppet-windows_env.svg)](LICENSE)
 [![Donated by Vox Pupuli](https://img.shields.io/badge/donated%20by-Vox%20Pupuli-fb7047.svg)](#transfer-notice)
+
 
 This module manages (system and user) Windows environment variables.
 

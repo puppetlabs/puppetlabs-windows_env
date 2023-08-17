@@ -1,5 +1,8 @@
 # windows_env
 
+[![Donated by Vox Pupuli](https://img.shields.io/badge/donated%20by-Vox%20Pupuli-fb7047.svg)](#transfer-notice)
+
+
 This module manages (system and user) Windows environment variables.
 
 ## Installation
@@ -241,3 +244,7 @@ The [puppet-windows-path](https://github.com/basti1302/puppet-windows-path)
 module by Bastian Krol was the starting point for this module.
 puppet-windows_env got migrated from [badgerious](https;//github.com/badgerious)
 to Vox Pupuli.
+
+## Transfer notice
+
+This module was previously maintained by Vox Pupuli. It was migrated to Puppet/Perforce in 2023.

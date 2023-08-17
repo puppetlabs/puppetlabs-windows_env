@@ -1,128 +1,89 @@
+<!-- markdownlint-disable MD024 -->
 # Changelog
 
 All notable changes to this project will be documented in this file.
-Each new release typically also includes the latest modulesync defaults.
-These should not affect the functionality of the module.
 
-## [v4.0.1](https://github.com/voxpupuli/puppet-windows_env/tree/v4.0.1) (2020-06-22)
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v4.0.0...v4.0.1)
+## [v5.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v5.0.0) - 2023-08-17
 
-**Fixed bugs:**
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v4.0.1...v5.0.0)
 
-- Fix: Could not set 'present' on ensure: uninitialized constant Win32::Registry::KEY\_WOW64\_64KEY [\#70](https://github.com/voxpupuli/puppet-windows_env/pull/70) ([cmchoi2000](https://github.com/cmchoi2000))
+### Added
 
-## [v4.0.0](https://github.com/voxpupuli/puppet-windows_env/tree/v4.0.0) (2020-05-10)
+- Add Puppet 8 support [#89](https://github.com/puppetlabs/puppetlabs-windows_env/pull/89) ([bastelfreak](https://github.com/bastelfreak))
 
-[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v3.2.0...v4.0.0)
+### Changed
+- Drop Puppet 6 support [#87](https://github.com/puppetlabs/puppetlabs-windows_env/pull/87) ([bastelfreak](https://github.com/bastelfreak))
 
-**Breaking changes:**
+## [v4.0.1](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v4.0.1) - 2020-06-24
 
-- modulesync 2.7.0 and drop puppet 4 [\#60](https://github.com/voxpupuli/puppet-windows_env/pull/60) ([bastelfreak](https://github.com/bastelfreak))
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v4.0.0...v4.0.1)
 
-**Closed issues:**
+### Fixed
 
-- Add a set of domain related facts [\#61](https://github.com/voxpupuli/puppet-windows_env/issues/61)
-- Update Readme and remove references to badgerious [\#31](https://github.com/voxpupuli/puppet-windows_env/issues/31)
+- Fix: Could not set 'present' on ensure: uninitialized constant Win32::Registry::KEY_WOW64_64KEY [#70](https://github.com/puppetlabs/puppetlabs-windows_env/pull/70) ([cmchoi2000](https://github.com/cmchoi2000))
 
-**Merged pull requests:**
+## [v4.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v4.0.0) - 2020-05-10
 
-- Fixed github url in README.md [\#64](https://github.com/voxpupuli/puppet-windows_env/pull/64) ([skrysmanski](https://github.com/skrysmanski))
-- Remove Linux acceptance nodesets [\#57](https://github.com/voxpupuli/puppet-windows_env/pull/57) ([ekohl](https://github.com/ekohl))
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v3.2.0...v4.0.0)
 
-## [v3.2.0](https://github.com/voxpupuli/puppet-windows_env/tree/v3.2.0) (2018-10-20)
+## [v3.2.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v3.2.0) - 2018-10-20
 
-[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v3.1.1...v3.2.0)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v3.1.1...v3.2.0)
 
-**Implemented enhancements:**
+### Added
 
-- \(FACT-1346\) Add default Windows facts as a custom fact [\#54](https://github.com/voxpupuli/puppet-windows_env/pull/54) ([glennsarti](https://github.com/glennsarti))
+- (FACT-1346) Add default Windows facts as a custom fact [#54](https://github.com/puppetlabs/puppetlabs-windows_env/pull/54) ([glennsarti](https://github.com/glennsarti))
 
-**Merged pull requests:**
+## [v3.1.1](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v3.1.1) - 2018-09-07
 
-- modulesync 2.2.0 and allow puppet 6.x [\#55](https://github.com/voxpupuli/puppet-windows_env/pull/55) ([bastelfreak](https://github.com/bastelfreak))
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v3.1.0...v3.1.1)
 
-## [v3.1.1](https://github.com/voxpupuli/puppet-windows_env/tree/v3.1.1) (2018-09-07)
+## [v3.1.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v3.1.0) - 2018-03-28
 
-[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v3.1.0...v3.1.1)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v3.0.0...v3.1.0)
 
-**Merged pull requests:**
+## [v3.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v3.0.0) - 2017-11-17
 
-- Remove docker nodesets [\#49](https://github.com/voxpupuli/puppet-windows_env/pull/49) ([bastelfreak](https://github.com/bastelfreak))
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.3.0...v3.0.0)
 
-## [v3.1.0](https://github.com/voxpupuli/puppet-windows_env/tree/v3.1.0) (2018-03-28)
+## [v2.3.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.3.0) - 2017-02-12
 
-[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v3.0.0...v3.1.0)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.2.2...v2.3.0)
 
-**Merged pull requests:**
+### Fixed
 
-- bump puppet to latest supported version 4.10.0 [\#46](https://github.com/voxpupuli/puppet-windows_env/pull/46) ([bastelfreak](https://github.com/bastelfreak))
-- rework README.md [\#45](https://github.com/voxpupuli/puppet-windows_env/pull/45) ([bastelfreak](https://github.com/bastelfreak))
-- Fix title patterns to not use unsupported proc [\#43](https://github.com/voxpupuli/puppet-windows_env/pull/43) ([treydock](https://github.com/treydock))
+- Check for clobber issues within a single catalog [#27](https://github.com/puppetlabs/puppetlabs-windows_env/pull/27) ([igalic](https://github.com/igalic))
 
-## [v3.0.0](https://github.com/voxpupuli/puppet-windows_env/tree/v3.0.0) (2017-11-17)
+## [v2.2.2](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.2.2) - 2015-08-08
 
-[Full Changelog](https://github.com/voxpupuli/puppet-windows_env/compare/v2.3.0...v3.0.0)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.2.1...v2.2.2)
 
-**Closed issues:**
+## [v2.2.1](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.2.1) - 2014-11-08
 
-- Issue with setting env variables that have multiple values separated by ";" [\#30](https://github.com/voxpupuli/puppet-windows_env/issues/30)
-- Puppet approved [\#20](https://github.com/voxpupuli/puppet-windows_env/issues/20)
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.2.0...v2.2.1)
 
-**Merged pull requests:**
+## [v2.2.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.2.0) - 2014-08-29
 
-- bump puppet version dependency to \>= 4.7.1 \< 6.0.0 [\#40](https://github.com/voxpupuli/puppet-windows_env/pull/40) ([bastelfreak](https://github.com/bastelfreak))
-- Removing non-windows nodesets. [\#36](https://github.com/voxpupuli/puppet-windows_env/pull/36) ([TraGicCode](https://github.com/TraGicCode))
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.1.0...v2.2.0)
 
-## [v2.3.0](https://github.com/voxpupuli/puppet-windows_env/tree/v2.3.0) (2017-02-12)
+## [v2.1.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.1.0) - 2014-05-28
 
-This is the last release with Puppet3 support!
-* Fix: Check for clobber issues within a single catalog
-* Add some basic type testing
-* Modulesync
-* Cleanup codebase
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.0.2...v2.1.0)
 
-### v2.2.2
+## [v2.0.2](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.0.2) - 2013-07-20
 
-- Updates for Puppet 4 / Ruby 2.1.5 compatibility.
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.0.1...v2.0.2)
 
-### v2.2.1
+## [v2.0.1](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.0.1) - 2013-07-20
 
-- Fixes to prevent autoloading on master from failing
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v2.0.0...v2.0.1)
 
-## v2.2.0
+## [v2.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.0.0) - 2013-07-20
 
-- Puppet 3.7 / Ruby 64 bit compatibility changes.
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v1.0.0...v2.0.0)
 
-## v2.1.0
+## [v1.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v1.0.0) - 2013-07-08
 
-- Use `post_resource_eval` hook instead of monkey patching if possible.
-- Some parameter validation moved into the Type (so it is caught earlier and
-  gives a better error message).
-- The validate stage now checks for multiple resources managing the same environment
-  variable in an incompatible way (e.g. two resources in clobber mergemode) and raises
-  an error if such conflicts are found.
-
-### v2.0.2
-
-- Fix formatting for puppetforge's markdown interpreter (version bump needed to push to puppetforge)
-
-### v2.0.1
-
-- Fix documentation (version bump needed to push to puppetforge)
-
-## v2.0.0
-
-- Remove 'manifests' directory. This directory had nothing useful in it.
-- Fixed name in Modulefile (was erroneously 'badgerious-puppet_env' now is 'badgerious-windows_env').
-- Add 'user' parameter to allow user specific variables to be managed.
-- Changed default 'broadcast_timeout' to 100ms. Puppet usually runs in the background, where the broadcasting
-  doesn't work anyway. There's no reason to be waiting for updates to go through that won't affect any users.
-
-## v1.0.0
-
-- Ensure now defaults to 'present'.
-- New parameter added, 'type'. Allows selection between REG_SZ or REG_EXPAND_SZ registry keys.
-
-
-\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/a91a72527f915eae4633da87e898fd99b632cd52...v1.0.0)

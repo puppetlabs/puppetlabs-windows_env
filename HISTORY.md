@@ -1,4 +1,4 @@
-## [v2.3.0](https://github.com/voxpupuli/puppet-windows_env/tree/v2.3.0) (2017-02-12)
+## [v2.3.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v2.3.0) (2017-02-12)
 
 This is the last release with Puppet3 support!
 * Fix: Check for clobber issues within a single catalog

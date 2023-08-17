@@ -1,5 +1,5 @@
 {
-  "name": "puppet-windows_env",
+  "name": "puppetlabs-windows_env",
   "version": "4.0.2-rc0",
   "author": "puppetlabs",
   "summary": "Manages Windows environment variables",

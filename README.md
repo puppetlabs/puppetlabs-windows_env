@@ -16,7 +16,7 @@ puppet module install puppet/windows_env
 Install from git (do this in your modulepath):
 
 ```sh
-git clone https://github.com/voxpupuli/puppet-windows_env windows_env
+git clone https://github.com/puppetlabs/puppetlabs-windows_env windows_env
 ```
 
 ## Changes
@@ -242,7 +242,7 @@ Note that the names will appear as uppercase in the fact, for example the `windi
 
 The [puppet-windows-path](https://github.com/basti1302/puppet-windows-path)
 module by Bastian Krol was the starting point for this module.
-puppet-windows_env got migrated from [badgerious](https;//github.com/badgerious)
+puppetlabs-windows_env got migrated from [badgerious](https;//github.com/badgerious)
 to Vox Pupuli.
 
 ## Transfer notice

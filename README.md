@@ -245,6 +245,10 @@ module by Bastian Krol was the starting point for this module.
 puppetlabs-windows_env got migrated from [badgerious](https;//github.com/badgerious)
 to Vox Pupuli.
 
+## License
+
+This codebase is licensed under the Apache2.0 licensing, however due to the nature of the codebase the open source dependencies may also use a combination of [AGPL](https://opensource.org/license/agpl-v3/), [BSD-2](https://opensource.org/license/bsd-2-clause/), [BSD-3](https://opensource.org/license/bsd-3-clause/), [GPL2.0](https://opensource.org/license/gpl-2-0/), [LGPL](https://opensource.org/license/lgpl-3-0/), [MIT](https://opensource.org/license/mit/) and [MPL](https://opensource.org/license/mpl-2-0/) Licensing.
+
 ## Transfer notice
 
 This module was previously maintained by Vox Pupuli. It was migrated to Puppet/Perforce in 2023.

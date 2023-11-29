@@ -11,3 +11,5 @@ spec/acceptance/nodesets/ec2/ubuntu-1604-x64.yml:
   delete: true
 spec/acceptance/nodesets/archlinux-2-x64.yml:
   delete: true
+.rubocop.yml:
+  unmanaged: true

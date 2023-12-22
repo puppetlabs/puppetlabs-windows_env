@@ -14,7 +14,10 @@ Puppet::Type.newtype(:windows_env) do
     # Cannot have two resources in clobber mode on the same var
     @mergemode[user] ||= {}
     last = @mergemode[user][var]
-    raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})" if (!last.nil? && last.catalog == resource.catalog) && ((resource[:mergemode] == :clobber && last) || (last && last[:mergemode] == :clobber))
+    raise "Multiple resources are managing the same environment variable but at least one is in clobber mergemode. (Offending resources: #{resource}, #{last})" \
+      if (!last.nil? && last.catalog == resource.catalog) && \
+         ((resource[:mergemode] == :clobber && last) || \
+         (last && last[:mergemode] == :clobber))
 
     @mergemode[user][var] = resource
 
@@ -97,7 +100,7 @@ Puppet::Type.newtype(:windows_env) do
   validate do
     raise "'value' parameter must be provided when 'ensure => present'" if self[:ensure] == :present && [nil, :undef].include?(self[:value])
     if self[:ensure] == :absent && [nil, :undef].include?(self[:value]) &&
-       %i[prepend append insert].include?(self[:mergemode])
+       [:prepend, :append, :insert].include?(self[:mergemode])
       raise "'value' parameter must be provided when 'ensure => absent' and 'mergemode => #{self[:mergemode]}'"
     end
 

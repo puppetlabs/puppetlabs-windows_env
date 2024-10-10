@@ -43,8 +43,8 @@ Puppet::Type.type(:windows_env).provide(:windows_env) do
   desc 'Manage Windows environment variables'
 
   confine feature: :windows_env
-  confine osfamily: :windows
-  defaultfor osfamily: :windows
+  confine 'os.family': :windows
+  defaultfor 'os.family': :windows
 
   # For testing registry open result
   ERROR_FILE_NOT_FOUND = 2

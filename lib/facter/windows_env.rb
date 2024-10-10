@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Facter.add('windows_env') do
-  confine osfamily: :windows
+  confine 'os.family': :windows
   setcode do
     require 'puppet/util/windows/process'
 

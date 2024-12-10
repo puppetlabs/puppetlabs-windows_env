@@ -5,16 +5,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v5.0.1](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v5.0.1) - 2024-12-10
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v5.0.0...v5.0.1)
+
+### Fixed
+
+- Update legacy facts to be compatible with Puppet 8 [#106](https://github.com/puppetlabs/puppetlabs-windows_env/pull/106) ([voreilly](https://github.com/voreilly))
+
 ## [v5.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v5.0.0) - 2023-08-17
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v4.0.1...v5.0.0)
 
+### Changed
+
+- Drop Puppet 6 support [#87](https://github.com/puppetlabs/puppetlabs-windows_env/pull/87) ([bastelfreak](https://github.com/bastelfreak))
+
 ### Added
 
 - Add Puppet 8 support [#89](https://github.com/puppetlabs/puppetlabs-windows_env/pull/89) ([bastelfreak](https://github.com/bastelfreak))
-
-### Changed
-- Drop Puppet 6 support [#87](https://github.com/puppetlabs/puppetlabs-windows_env/pull/87) ([bastelfreak](https://github.com/bastelfreak))
 
 ## [v4.0.1](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v4.0.1) - 2020-06-24
 

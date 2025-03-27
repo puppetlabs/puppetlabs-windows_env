@@ -2,7 +2,7 @@
   "name": "puppetlabs-windows_env",
   "version": "5.0.1",
   "author": "puppetlabs",
-  "summary": "Manages Windows environment variables",
+  "summary": "Module for managing the windows environment variables for Windows 2016, 2019, and 2022.",
   "license": "Apache-2.0",
   "source": "https://github.com/puppetlabs/puppetlabs-windows_env",
   "project_page": "https://github.com/puppetlabs/puppetlabs-windows_env",

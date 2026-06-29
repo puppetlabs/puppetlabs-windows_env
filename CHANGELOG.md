@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v6.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v6.0.0) - 2026-06-28
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v5.0.2...v6.0.0)
+
+### Changed
+
+- (CAT-2398) Puppetcore update [#112](https://github.com/puppetlabs/puppetlabs-windows_env/pull/112) ([LukasAud](https://github.com/LukasAud))
+
+### Other
+
+- (MODULES-11840) Allow puppetlabs/stdlib 10.x [#113](https://github.com/puppetlabs/puppetlabs-windows_env/pull/113) ([imaqsood](https://github.com/imaqsood))
+
 ## [v5.0.2](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v5.0.2) - 2025-03-27
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v5.0.1...v5.0.2)

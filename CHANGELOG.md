@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## [v6.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v6.0.0) - 2026-06-28
+## [v6.1.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v6.1.0) - 2026-07-14
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v6.0.0...v6.1.0)
+
+### Added
+
+- (MODULES-11891) Add Windows Server 2025 support [#115](https://github.com/puppetlabs/puppetlabs-windows_env/pull/115) ([imaqsood](https://github.com/imaqsood))
+
+## [v6.0.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v6.0.0) - 2026-06-29
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v5.0.2...v6.0.0)
 

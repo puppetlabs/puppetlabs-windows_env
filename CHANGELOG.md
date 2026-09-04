@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v6.2.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v6.2.0) - 2026-09-04
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v6.1.0...v6.2.0)
+
+### Added
+
+- (MODULES-11728) Add support for Puppet 9 [#117](https://github.com/puppetlabs/puppetlabs-windows_env/pull/117) ([SugatD](https://github.com/SugatD))
+
 ## [v6.1.0](https://github.com/puppetlabs/puppetlabs-windows_env/tree/v6.1.0) - 2026-07-14
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-windows_env/compare/v6.0.0...v6.1.0)

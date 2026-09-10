@@ -13,3 +13,7 @@ spec/acceptance/nodesets/archlinux-2-x64.yml:
   delete: true
 .rubocop.yml:
   include_todos: true
+Gemfile:
+  overrides:
+    - gem: 'puppet_litmus'
+      version: '~> 2.0'

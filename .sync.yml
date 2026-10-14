@@ -13,3 +13,5 @@ spec/acceptance/nodesets/archlinux-2-x64.yml:
   delete: true
 .rubocop.yml:
   include_todos: true
+.github/workflows/nightly.yml:
+  cron: '50 1 * * *'
